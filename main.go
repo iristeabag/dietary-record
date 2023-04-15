@@ -3,6 +3,7 @@ package main
 import (
 	"database/sql"
 	"fmt"
+	b "go-kit-demo/body/service"
 	e "go-kit-demo/eat/service"
 	f "go-kit-demo/food/service"
 	"net/http"
@@ -51,6 +52,17 @@ func main() {
 			os.Exit(-1)
 		}
 		food = f.NewFoodService(foodRepo, logger)
+	}
+
+	var body b.IBodyService
+	body = b.BodyService{}
+	{
+		bodyRepo, err := b.NewBodyRepository(db, logger)
+		if err != nil {
+			level.Error(logger).Log("exit", err)
+			os.Exit(-1)
+		}
+		body = b.NewBodyService(bodyRepo, logger)
 	}
 
 	var eat e.IEatService
@@ -116,6 +128,32 @@ func main() {
 		e.DecodeDeleteEatRequest,
 		e.EncodeResponse,
 	)
+	// Body Handler
+	CreateBodyHandler := httptransport.NewServer(
+		b.CreateBodyEndpoint(body),
+		b.DecodeCreateBodyRequest,
+		b.EncodeResponse,
+	)
+	GetByBodyIdHandler := httptransport.NewServer(
+		b.GetBodyByIdEndpoint(body),
+		b.DecodeGetBodyByIdRequest,
+		b.EncodeResponse,
+	)
+	GetAllBodysHandler := httptransport.NewServer(
+		b.GetAllBodysEndpoint(body),
+		b.DecodeGetAllBodysRequest,
+		b.EncodeResponse,
+	)
+	UpdateBodyHandler := httptransport.NewServer(
+		b.UpdateBodyEndpoint(body),
+		b.DecodeUpdateBodyRequest,
+		b.EncodeResponse,
+	)
+	DeleteBodyHandler := httptransport.NewServer(
+		b.DeleteBodyEndpoint(body),
+		b.DecodeDeleteBodyRequest,
+		b.EncodeResponse,
+	)
 
 	r := mux.NewRouter()
 	http.Handle("/", r)
@@ -130,6 +168,12 @@ func main() {
 	r.Handle("/eat/all", GetAllEatsHandler).Methods("GET")
 	r.Handle("/eat/{eatid}", GetByEatIdHandler).Methods("GET")
 	r.Handle("/eat/{eatid}", DeleteEatHandler).Methods("DELETE")
+
+	http.Handle("/body", CreateBodyHandler)
+	http.Handle("/body/update", UpdateBodyHandler)
+	r.Handle("/body/all", GetAllBodysHandler).Methods("GET")
+	r.Handle("/body/{bodyid}", GetByBodyIdHandler).Methods("GET")
+	r.Handle("/body/{bodyid}", DeleteBodyHandler).Methods("DELETE")
 
 	http.ListenAndServe(":8080", nil)
 }
