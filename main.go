@@ -3,6 +3,7 @@ package main
 import (
 	"database/sql"
 	"fmt"
+	e "go-kit-demo/eat/service"
 	f "go-kit-demo/food/service"
 	"net/http"
 	"os"
@@ -52,6 +53,17 @@ func main() {
 		food = f.NewFoodService(foodRepo, logger)
 	}
 
+	var eat e.IEatService
+	eat = e.EatService{}
+	{
+		eatRepo, err := e.NewEatRepository(db, logger)
+		if err != nil {
+			level.Error(logger).Log("exit", err)
+			os.Exit(-1)
+		}
+		eat = e.NewEatService(eatRepo, logger)
+	}
+
 	// Food Handler
 	CreateFoodHandler := httptransport.NewServer(
 		f.CreateFoodEndpoint(food),
@@ -78,6 +90,32 @@ func main() {
 		f.DecodeDeleteFoodRequest,
 		f.EncodeResponse,
 	)
+	// Eat Handler
+	CreateEatHandler := httptransport.NewServer(
+		e.CreateEatEndpoint(eat),
+		e.DecodeCreateEatRequest,
+		e.EncodeResponse,
+	)
+	GetByEatIdHandler := httptransport.NewServer(
+		e.GetEatByIdEndpoint(eat),
+		e.DecodeGetEatByIdRequest,
+		e.EncodeResponse,
+	)
+	GetAllEatsHandler := httptransport.NewServer(
+		e.GetAllEatsEndpoint(eat),
+		e.DecodeGetAllEatsRequest,
+		e.EncodeResponse,
+	)
+	UpdateEatHandler := httptransport.NewServer(
+		e.UpdateEatEndpoint(eat),
+		e.DecodeUpdateEatRequest,
+		e.EncodeResponse,
+	)
+	DeleteEatHandler := httptransport.NewServer(
+		e.DeleteEatEndpoint(eat),
+		e.DecodeDeleteEatRequest,
+		e.EncodeResponse,
+	)
 
 	r := mux.NewRouter()
 	http.Handle("/", r)
@@ -86,6 +124,12 @@ func main() {
 	r.Handle("/food/all", GetAllFoodsHandler).Methods("GET")
 	r.Handle("/food/{foodid}", GetByFoodIdHandler).Methods("GET")
 	r.Handle("/food/{foodid}", DeleteFoodHandler).Methods("DELETE")
+
+	http.Handle("/eat", CreateEatHandler)
+	http.Handle("/eat/update", UpdateEatHandler)
+	r.Handle("/eat/all", GetAllEatsHandler).Methods("GET")
+	r.Handle("/eat/{eatid}", GetByEatIdHandler).Methods("GET")
+	r.Handle("/eat/{eatid}", DeleteEatHandler).Methods("DELETE")
 
 	http.ListenAndServe(":8080", nil)
 }
