@@ -2,8 +2,13 @@ package service
 
 import (
 	"context"
+	"errors"
 
 	"github.com/go-kit/log"
+)
+
+var (
+	errInvalidFoodID = errors.New("food id is invalid")
 )
 
 type Food struct {
@@ -19,11 +24,11 @@ type Food struct {
 }
 
 type IFoodRepository interface {
-	GetFoodById(ctx context.Context, id string) (interface{}, error)
+	GetFoodById(ctx context.Context, id int) (interface{}, error)
 	GetAllFoods(ctx context.Context) (interface{}, error)
 	CreateFood(ctx context.Context, food Food) error
 	UpdateFood(ctx context.Context, food Food) (string, error)
-	DeleteFood(ctx context.Context, id string) (string, error)
+	DeleteFood(ctx context.Context, id int) (string, error)
 }
 
 type FoodService struct {
@@ -32,11 +37,11 @@ type FoodService struct {
 }
 
 type IFoodService interface {
-	GetFoodById(ctx context.Context, id string) (interface{}, error)
+	GetFoodById(ctx context.Context, id int) (interface{}, error)
 	GetAllFoods(ctx context.Context) (interface{}, error)
 	CreateFood(ctx context.Context, food Food) (string, error)
-	UpdateFood(ctx context.Context, food Food) (string, error)
-	DeleteFood(ctx context.Context, id string) (string, error)
+	UpdateFood(ctx context.Context, id string, food Food) (string, error)
+	DeleteFood(ctx context.Context, id int) (string, error)
 }
 
 // NewService creates and returns a new Account service instance
@@ -47,16 +52,16 @@ func NewFoodService(rep IFoodRepository, logger log.Logger) IFoodService {
 	}
 }
 
-func (s FoodService) GetFoodById(ctx context.Context, id string) (interface{}, error) {
+func (s FoodService) GetFoodById(ctx context.Context, id int) (interface{}, error) {
 	var food interface{}
 	var empty interface{}
 
-	food, err := s.repository.GetFoodById(ctx, id)
-	if err == nil {
-		return food, nil
+	food, err1 := s.repository.GetFoodById(ctx, id)
+	if err1 != nil {
+		return empty, err1
 	}
 
-	return empty, err
+	return food, nil
 }
 
 func (s FoodService) GetAllFoods(ctx context.Context) (interface{}, error) {
@@ -75,7 +80,6 @@ func (s FoodService) CreateFood(ctx context.Context, food Food) (string, error) 
 	var msg = "success"
 
 	foodDetail := Food{
-		Foodid:  food.Foodid,
 		Name:    food.Name,
 		Brand:   food.Brand,
 		Amount:  food.Amount,
@@ -93,9 +97,9 @@ func (s FoodService) CreateFood(ctx context.Context, food Food) (string, error) 
 	return msg, nil
 }
 
-func (s FoodService) UpdateFood(ctx context.Context, food Food) (string, error) {
+func (s FoodService) UpdateFood(ctx context.Context, id string, food Food) (string, error) {
 	foodDetail := Food{
-		Foodid:  food.Foodid,
+		Foodid:  id,
 		Name:    food.Name,
 		Brand:   food.Brand,
 		Amount:  food.Amount,
@@ -114,7 +118,7 @@ func (s FoodService) UpdateFood(ctx context.Context, food Food) (string, error) 
 	return msg, nil
 }
 
-func (s FoodService) DeleteFood(ctx context.Context, id string) (string, error) {
+func (s FoodService) DeleteFood(ctx context.Context, id int) (string, error) {
 	msg, err := s.repository.DeleteFood(ctx, id)
 	if err != nil {
 		return "", err

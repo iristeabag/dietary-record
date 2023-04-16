@@ -18,10 +18,10 @@ import (
 
 const (
 	host     = "localhost"
-	port     = 54320
+	port     = 5455
 	user     = "postgres"
 	password = "postgres"
-	dbname   = "dietary"
+	dbname   = "demo"
 )
 
 func GetDbConn() *sql.DB {
@@ -31,9 +31,15 @@ func GetDbConn() *sql.DB {
 
 	db, err := sql.Open("postgres", psqlInfo)
 	if err != nil {
+		fmt.Println("connected fail!")
 		panic(err)
 	}
-	defer db.Close()
+
+	err = db.Ping()
+	if err != nil {
+		fmt.Println("ping fail!")
+		panic(err)
+	}
 
 	fmt.Println("Successfully connected!")
 	return db
@@ -42,6 +48,7 @@ func GetDbConn() *sql.DB {
 func main() {
 	logger := log.NewLogfmtLogger(os.Stderr)
 	db := GetDbConn()
+	defer db.Close()
 
 	var food f.IFoodService
 	food = f.FoodService{}
@@ -157,8 +164,9 @@ func main() {
 
 	r := mux.NewRouter()
 	http.Handle("/", r)
-	http.Handle("/food", CreateFoodHandler)
-	http.Handle("/food/update", UpdateFoodHandler)
+
+	r.Handle("/food", CreateFoodHandler).Methods("POST")
+	r.Handle("/food/{foodid}", UpdateFoodHandler).Methods("PATCH")
 	r.Handle("/food/all", GetAllFoodsHandler).Methods("GET")
 	r.Handle("/food/{foodid}", GetByFoodIdHandler).Methods("GET")
 	r.Handle("/food/{foodid}", DeleteFoodHandler).Methods("DELETE")

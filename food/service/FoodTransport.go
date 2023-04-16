@@ -38,6 +38,8 @@ func DecodeCreateFoodRequest(_ context.Context, r *http.Request) (interface{}, e
 func DecodeUpdateFoodRequest(_ context.Context, r *http.Request) (interface{}, error) {
 	fmt.Println("-------->>>> Into Update Decoding")
 	var req UpdateFoodRequest
+	vars := mux.Vars(r)
+	req.Id = vars["foodid"]
 	if err := json.NewDecoder(r.Body).Decode(&req.food); err != nil {
 		return nil, err
 	}

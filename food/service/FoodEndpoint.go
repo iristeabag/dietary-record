@@ -2,6 +2,8 @@ package service
 
 import (
 	"context"
+	"fmt"
+	"strconv"
 
 	"github.com/go-kit/kit/endpoint"
 )
@@ -28,6 +30,7 @@ type (
 		Err error  `json:"error,omitempty"`
 	}
 	UpdateFoodRequest struct {
+		Id   string `json:"foodid"`
 		food Food
 	}
 	UpdateFoodResponse struct {
@@ -47,7 +50,8 @@ type (
 func GetFoodByIdEndpoint(s IFoodService) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
 		req := request.(GetFoodByIdRequest)
-		foodDetails, err := s.GetFoodById(ctx, req.Id)
+		id, _ := strconv.Atoi(req.Id)
+		foodDetails, err := s.GetFoodById(ctx, id)
 		if err != nil {
 			return GetFoodByIdResponse{Food: foodDetails, Err: "Id not found"}, nil
 		}
@@ -75,7 +79,8 @@ func CreateFoodEndpoint(s IFoodService) endpoint.Endpoint {
 func UpdateFoodEndpoint(s IFoodService) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
 		req := request.(UpdateFoodRequest)
-		msg, err := s.UpdateFood(ctx, req.food)
+		fmt.Println(req.Id)
+		msg, err := s.UpdateFood(ctx, req.Id, req.food)
 		return msg, err
 	}
 }
@@ -83,7 +88,8 @@ func UpdateFoodEndpoint(s IFoodService) endpoint.Endpoint {
 func DeleteFoodEndpoint(s IFoodService) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
 		req := request.(DeleteFoodRequest)
-		msg, err := s.DeleteFood(ctx, req.Foodid)
+		id, _ := strconv.Atoi(req.Foodid)
+		msg, err := s.DeleteFood(ctx, id)
 		if err != nil {
 			return DeleteFoodResponse{Msg: msg, Err: err}, nil
 		}
