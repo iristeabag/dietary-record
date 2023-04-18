@@ -3,8 +3,8 @@ package server
 import (
 	"database/sql"
 	"fmt"
+	pb "go-kit-demo/food/proto"
 	f "go-kit-demo/food/service"
-	pb "go-kit-demo/proto/food"
 	"net"
 	"os"
 	"os/signal"

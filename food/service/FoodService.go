@@ -15,12 +15,12 @@ type Food struct {
 	Foodid  string  `json:"foodid"`
 	Name    string  `json:"name"`
 	Brand   string  `json:"brand"`
-	Amount  float32 `json:"amount"`
+	Amount  float64 `json:"amount"`
 	Unit    string  `json:"unit"`
-	Carb    float32 `json:"carb"`
-	Portein float32 `json:"portein"`
-	Fat     float32 `json:"fat"`
-	Cal     float32 `json:"cal"`
+	Carb    float64 `json:"carb"`
+	Portein float64 `json:"portein"`
+	Fat     float64 `json:"fat"`
+	Cal     float64 `json:"cal"`
 }
 
 type IFoodRepository interface {

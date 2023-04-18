@@ -53,12 +53,12 @@ func newFood(f FoodObj) Food {
 		Foodid:  strconv.Itoa(f.id),
 		Name:    f.name,
 		Brand:   f.brand,
-		Amount:  float32(amount),
+		Amount:  amount,
 		Unit:    f.unit,
-		Carb:    float32(carb),
-		Portein: float32(portein),
-		Fat:     float32(fat),
-		Cal:     float32(cal),
+		Carb:    carb,
+		Portein: portein,
+		Fat:     fat,
+		Cal:     cal,
 	}
 }
 
