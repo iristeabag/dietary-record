@@ -81,7 +81,7 @@ func UpdateFoodEndpoint(s IFoodService) endpoint.Endpoint {
 		req := request.(UpdateFoodRequest)
 		fmt.Println(req.Id)
 		msg, err := s.UpdateFood(ctx, req.Id, req.food)
-		return msg, err
+		return UpdateFoodResponse{Msg: msg, Err: nil}, err
 	}
 }
 
