@@ -53,16 +53,16 @@ func newFood(f FoodObj) Food {
 		Foodid:  strconv.Itoa(f.id),
 		Name:    f.name,
 		Brand:   f.brand,
-		Amount:  amount,
+		Amount:  float32(amount),
 		Unit:    f.unit,
-		Carb:    carb,
-		Portein: portein,
-		Fat:     fat,
-		Cal:     cal,
+		Carb:    float32(carb),
+		Portein: float32(portein),
+		Fat:     float32(fat),
+		Cal:     float32(cal),
 	}
 }
 
-func (f *FoodRepository) GetFoodById(ctx context.Context, id int) (interface{}, error) {
+func (f *FoodRepository) GetFoodById(ctx context.Context, id int64) (interface{}, error) {
 	var food FoodObj
 	q := `SELECT id, name, brand, amount, unit, carb, portein, fat, cal FROM food WHERE id=$1`
 	row := f.db.QueryRowContext(ctx, q, id)

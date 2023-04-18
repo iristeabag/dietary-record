@@ -51,7 +51,7 @@ func GetFoodByIdEndpoint(s IFoodService) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
 		req := request.(GetFoodByIdRequest)
 		id, _ := strconv.Atoi(req.Id)
-		foodDetails, err := s.GetFoodById(ctx, id)
+		foodDetails, err := s.GetFoodById(ctx, int64(id))
 		if err != nil {
 			return GetFoodByIdResponse{Food: foodDetails, Err: "Id not found"}, nil
 		}

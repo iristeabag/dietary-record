@@ -15,16 +15,16 @@ type Food struct {
 	Foodid  string  `json:"foodid"`
 	Name    string  `json:"name"`
 	Brand   string  `json:"brand"`
-	Amount  float64 `json:"amount"`
+	Amount  float32 `json:"amount"`
 	Unit    string  `json:"unit"`
-	Carb    float64 `json:"carb"`
-	Portein float64 `json:"portein"`
-	Fat     float64 `json:"fat"`
-	Cal     float64 `json:"cal"`
+	Carb    float32 `json:"carb"`
+	Portein float32 `json:"portein"`
+	Fat     float32 `json:"fat"`
+	Cal     float32 `json:"cal"`
 }
 
 type IFoodRepository interface {
-	GetFoodById(ctx context.Context, id int) (interface{}, error)
+	GetFoodById(ctx context.Context, id int64) (interface{}, error)
 	GetAllFoods(ctx context.Context) (interface{}, error)
 	CreateFood(ctx context.Context, food Food) error
 	UpdateFood(ctx context.Context, food Food) (string, error)
@@ -37,7 +37,7 @@ type FoodService struct {
 }
 
 type IFoodService interface {
-	GetFoodById(ctx context.Context, id int) (interface{}, error)
+	GetFoodById(ctx context.Context, id int64) (interface{}, error)
 	GetAllFoods(ctx context.Context) (interface{}, error)
 	CreateFood(ctx context.Context, food Food) (string, error)
 	UpdateFood(ctx context.Context, id string, food Food) (string, error)
@@ -52,7 +52,7 @@ func NewFoodService(rep IFoodRepository, logger log.Logger) IFoodService {
 	}
 }
 
-func (s FoodService) GetFoodById(ctx context.Context, id int) (interface{}, error) {
+func (s FoodService) GetFoodById(ctx context.Context, id int64) (interface{}, error) {
 	var food interface{}
 	var empty interface{}
 
