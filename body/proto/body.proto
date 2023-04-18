@@ -1,0 +1,29 @@
+syntax = "proto3";
+
+package body;
+option go_package = "proto/body";
+
+message GetByIdRequest {
+  int64 Id = 1;
+}
+message GetBodyByIdResponse {
+    string Bodyid = 1;
+    float  Weight = 2;
+    float  Muscle = 3;
+    float  FatRate = 4;
+}
+
+message CreateBodyRequest {
+    float  Weight = 1;
+    float  Muscle = 2;
+    float  FatRate = 3;
+}
+message DefaultResponse {
+    string result = 1;
+}
+
+service BodyService {
+  rpc GetBodyById(GetByIdRequest) returns (GetBodyByIdResponse) {};
+  rpc CreateBody(CreateBodyRequest) returns (DefaultResponse) {};
+  rpc DeleteBody(GetByIdRequest) returns (DefaultResponse) {};
+}

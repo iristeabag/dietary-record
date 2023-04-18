@@ -21,13 +21,6 @@ func DecodeGetBodyByIdRequest(_ context.Context, r *http.Request) (interface{}, 
 }
 
 func DecodeGetAllBodysRequest(_ context.Context, r *http.Request) (interface{}, error) {
-	if r.URL.Query().Get("date") != "" {
-		fmt.Println("-------->>>> Into GetBodysByDate Decoding")
-		date := r.URL.Query().Get("date")
-		return GetAllBodysRequest{
-			Date: date,
-		}, nil
-	}
 	fmt.Println("-------->>>> Into GetBodys Decoding")
 	var req GetAllBodysRequest
 	return req, nil
@@ -36,15 +29,6 @@ func DecodeGetAllBodysRequest(_ context.Context, r *http.Request) (interface{}, 
 func DecodeCreateBodyRequest(_ context.Context, r *http.Request) (interface{}, error) {
 	var req CreateBodyRequest
 	fmt.Println("-------->>>>into Decoding")
-	if err := json.NewDecoder(r.Body).Decode(&req.body); err != nil {
-		return nil, err
-	}
-	return req, nil
-}
-
-func DecodeUpdateBodyRequest(_ context.Context, r *http.Request) (interface{}, error) {
-	fmt.Println("-------->>>> Into Update Decoding")
-	var req UpdateBodyRequest
 	if err := json.NewDecoder(r.Body).Decode(&req.body); err != nil {
 		return nil, err
 	}

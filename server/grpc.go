@@ -3,7 +3,9 @@ package server
 import (
 	"database/sql"
 	"fmt"
-	pb "go-kit-demo/food/proto"
+	bpb "go-kit-demo/body/proto"
+	b "go-kit-demo/body/service"
+	fpb "go-kit-demo/food/proto"
 	f "go-kit-demo/food/service"
 	"net"
 	"os"
@@ -31,8 +33,21 @@ func GrpcRun(db *sql.DB, logger log.Logger) {
 		food = f.NewFoodService(foodRepo, logger)
 	}
 
+	var body b.IBodyService
+	body = b.BodyService{}
+	{
+		bodyRepo, err := b.NewBodyRepository(db, logger)
+		if err != nil {
+			level.Error(logger).Log("exit", err)
+			os.Exit(-1)
+		}
+		body = b.NewBodyService(bodyRepo, logger)
+	}
+
 	foodendpoint := f.MakeGrpcEndpoints(food)
-	grpcServer := f.NewGRPCServer(foodendpoint, logger)
+	fgrpcServer := f.NewGRPCServer(foodendpoint, logger)
+	bodypoint := b.MakeGrpcEndpoints(body)
+	bgrpcServer := b.NewGRPCServer(bodypoint, logger)
 
 	errs := make(chan error)
 	go func() {
@@ -41,7 +56,7 @@ func GrpcRun(db *sql.DB, logger log.Logger) {
 		errs <- fmt.Errorf("%s", <-c)
 	}()
 
-	grpcListener, err := net.Listen("tcp", ":50053")
+	grpcListener, err := net.Listen("tcp", ":50056")
 	if err != nil {
 		logger.Log("during", "Listen", "err", err)
 		os.Exit(1)
@@ -49,7 +64,8 @@ func GrpcRun(db *sql.DB, logger log.Logger) {
 
 	go func() {
 		baseServer := grpc.NewServer()
-		pb.RegisterFoodServiceServer(baseServer, grpcServer)
+		fpb.RegisterFoodServiceServer(baseServer, fgrpcServer)
+		bpb.RegisterBodyServiceServer(baseServer, bgrpcServer)
 		level.Info(logger).Log("msg", "Server started successfully 🚀")
 		baseServer.Serve(grpcListener)
 	}()

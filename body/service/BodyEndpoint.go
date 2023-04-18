@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"strconv"
 
 	"github.com/go-kit/kit/endpoint"
 )
@@ -15,14 +16,12 @@ type (
 		Err  string      `json:"error,omitempty"`
 	}
 
-	GetAllBodysRequest struct {
-		Date string `json:"date"`
-	}
-
+	GetAllBodysRequest  struct{}
 	GetAllBodysResponse struct {
 		Body interface{} `json:"body,omitempty"`
 		Err  string      `json:"error,omitempty"`
 	}
+
 	CreateBodyRequest struct {
 		body Body
 	}
@@ -30,17 +29,10 @@ type (
 		Msg string `json:"msg"`
 		Err error  `json:"error,omitempty"`
 	}
-	UpdateBodyRequest struct {
-		body Body
-	}
-	UpdateBodyResponse struct {
-		Msg string `json:"status,omitempty"`
-		Err error  `json:"error,omitempty"`
-	}
+
 	DeleteBodyRequest struct {
 		Id string `json:"bodyid"`
 	}
-
 	DeleteBodyResponse struct {
 		Msg string `json:"response"`
 		Err error  `json:"error,omitempty"`
@@ -50,7 +42,8 @@ type (
 func GetBodyByIdEndpoint(e IBodyService) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
 		req := request.(GetBodyByIdRequest)
-		bodyDetails, err := e.GetBodyById(ctx, req.Id)
+		id, _ := strconv.Atoi(req.Id)
+		bodyDetails, err := e.GetBodyById(ctx, id)
 		if err != nil {
 			return GetBodyByIdResponse{Body: bodyDetails, Err: "Id not found"}, nil
 		}
@@ -60,14 +53,7 @@ func GetBodyByIdEndpoint(e IBodyService) endpoint.Endpoint {
 
 func GetAllBodysEndpoint(e IBodyService) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
-		req := request.(GetAllBodysRequest)
-		var bodyDetails interface{}
-		var err error
-		if req.Date != "" {
-			bodyDetails, err = e.GetBodyByDate(ctx, req.Date)
-		} else {
-			bodyDetails, err = e.GetAllBodys(ctx)
-		}
+		bodyDetails, err := e.GetAllBodys(ctx)
 
 		if err != nil {
 			return GetAllBodysResponse{Body: bodyDetails, Err: "no data found"}, nil
@@ -84,18 +70,11 @@ func CreateBodyEndpoint(e IBodyService) endpoint.Endpoint {
 	}
 }
 
-func UpdateBodyEndpoint(e IBodyService) endpoint.Endpoint {
-	return func(ctx context.Context, request interface{}) (interface{}, error) {
-		req := request.(UpdateBodyRequest)
-		msg, err := e.UpdateBody(ctx, req.body)
-		return msg, err
-	}
-}
-
 func DeleteBodyEndpoint(e IBodyService) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
 		req := request.(DeleteBodyRequest)
-		msg, err := e.DeleteBody(ctx, req.Id)
+		id, _ := strconv.Atoi(req.Id)
+		msg, err := e.DeleteBody(ctx, id)
 		if err != nil {
 			return DeleteBodyResponse{Msg: msg, Err: err}, nil
 		}

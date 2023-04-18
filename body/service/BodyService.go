@@ -14,12 +14,10 @@ type Body struct {
 }
 
 type IBodyRepository interface {
-	GetBodyById(ctx context.Context, id string) (interface{}, error)
-	GetBodyByDate(ctx context.Context, date string) (interface{}, error)
+	GetBodyById(ctx context.Context, id int) (interface{}, error)
 	GetAllBodys(ctx context.Context) (interface{}, error)
 	CreateBody(ctx context.Context, body Body) error
-	UpdateBody(ctx context.Context, body Body) (string, error)
-	DeleteBody(ctx context.Context, id string) (string, error)
+	DeleteBody(ctx context.Context, id int) (string, error)
 }
 
 type BodyService struct {
@@ -28,12 +26,10 @@ type BodyService struct {
 }
 
 type IBodyService interface {
-	GetBodyById(ctx context.Context, id string) (interface{}, error)
-	GetBodyByDate(ctx context.Context, date string) (interface{}, error)
+	GetBodyById(ctx context.Context, id int) (interface{}, error)
 	GetAllBodys(ctx context.Context) (interface{}, error)
 	CreateBody(ctx context.Context, body Body) (string, error)
-	UpdateBody(ctx context.Context, body Body) (string, error)
-	DeleteBody(ctx context.Context, id string) (string, error)
+	DeleteBody(ctx context.Context, id int) (string, error)
 }
 
 func NewBodyService(rep IBodyRepository, logger log.Logger) IBodyService {
@@ -43,25 +39,13 @@ func NewBodyService(rep IBodyRepository, logger log.Logger) IBodyService {
 	}
 }
 
-func (s BodyService) GetBodyById(ctx context.Context, id string) (interface{}, error) {
+func (s BodyService) GetBodyById(ctx context.Context, id int) (interface{}, error) {
 	var body interface{}
 	var empty interface{}
 
 	body, err := s.repository.GetBodyById(ctx, id)
 	if err == nil {
 		return body, nil
-	}
-
-	return empty, err
-}
-
-func (s BodyService) GetBodyByDate(ctx context.Context, date string) (interface{}, error) {
-	var bodys interface{}
-	var empty interface{}
-
-	bodys, err := s.repository.GetBodyByDate(ctx, date)
-	if err == nil {
-		return bodys, nil
 	}
 
 	return empty, err
@@ -97,23 +81,7 @@ func (s BodyService) CreateBody(ctx context.Context, body Body) (string, error) 
 	return msg, err
 }
 
-func (s BodyService) UpdateBody(ctx context.Context, body Body) (string, error) {
-	bodyDetail := Body{
-		Id:      body.Id,
-		Weight:  body.Weight,
-		Muscle:  body.Muscle,
-		FatRate: body.FatRate,
-	}
-
-	msg, err := s.repository.UpdateBody(ctx, bodyDetail)
-	if err != nil {
-		return "", err
-	}
-
-	return msg, nil
-}
-
-func (s BodyService) DeleteBody(ctx context.Context, id string) (string, error) {
+func (s BodyService) DeleteBody(ctx context.Context, id int) (string, error) {
 	msg, err := s.repository.DeleteBody(ctx, id)
 	if err != nil {
 		return "", err
