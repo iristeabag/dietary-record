@@ -35,6 +35,17 @@ func DecodeCreateBodyRequest(_ context.Context, r *http.Request) (interface{}, e
 	return req, nil
 }
 
+func DecodeUpdateBodyRequest(_ context.Context, r *http.Request) (interface{}, error) {
+	fmt.Println("-------->>>> Into Update Decoding")
+	var req UpdateBodyRequest
+	vars := mux.Vars(r)
+	req.Id = vars["bodyid"]
+	if err := json.NewDecoder(r.Body).Decode(&req.body); err != nil {
+		return nil, err
+	}
+	return req, nil
+}
+
 func EncodeResponse(_ context.Context, w http.ResponseWriter, response interface{}) error {
 	w.Header().Set("Content-Type", "application/json; charset=utf-8")
 	fmt.Println("into Encoding <<<<<<----------------")

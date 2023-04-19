@@ -29,6 +29,14 @@ type (
 		Msg string `json:"msg"`
 		Err error  `json:"error,omitempty"`
 	}
+	UpdateBodyRequest struct {
+		Id   string `json:"bodyid"`
+		body Body
+	}
+	UpdateBodyResponse struct {
+		Msg string `json:"status,omitempty"`
+		Err error  `json:"error,omitempty"`
+	}
 
 	DeleteBodyRequest struct {
 		Id string `json:"bodyid"`
@@ -67,6 +75,15 @@ func CreateBodyEndpoint(e IBodyService) endpoint.Endpoint {
 		req := request.(CreateBodyRequest)
 		msg, err := e.CreateBody(ctx, req.body)
 		return CreateBodyResponse{Msg: msg, Err: err}, nil
+	}
+}
+
+func UpdateBodyEndpoint(s IBodyService) endpoint.Endpoint {
+	return func(ctx context.Context, request interface{}) (interface{}, error) {
+		req := request.(UpdateBodyRequest)
+		req.body.Id = req.Id
+		msg, err := s.UpdateBody(ctx, req.body)
+		return UpdateBodyResponse{Msg: msg, Err: nil}, err
 	}
 }
 

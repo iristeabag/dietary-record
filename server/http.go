@@ -118,6 +118,11 @@ func HttpRun(db *sql.DB, logger log.Logger) {
 		b.DecodeGetAllBodysRequest,
 		b.EncodeResponse,
 	)
+	UpdateBodyHandler := httptransport.NewServer(
+		b.UpdateBodyEndpoint(body),
+		b.DecodeUpdateBodyRequest,
+		b.EncodeResponse,
+	)
 	DeleteBodyHandler := httptransport.NewServer(
 		b.DeleteBodyEndpoint(body),
 		b.DecodeDeleteBodyRequest,
@@ -140,6 +145,7 @@ func HttpRun(db *sql.DB, logger log.Logger) {
 	r.Handle("/eat/{eatid:[0-9]+}", DeleteEatHandler).Methods("DELETE")
 
 	r.Handle("/body", CreateBodyHandler).Methods("POST")
+	r.Handle("/body/{bodyid:[0-9]+}", UpdateBodyHandler).Methods("PATCH")
 	r.Handle("/bodys", GetAllBodysHandler).Methods("GET")
 	r.Handle("/body/{bodyid:[0-9]+}", GetByBodyIdHandler).Methods("GET")
 	r.Handle("/body/{bodyid:[0-9]+}", DeleteBodyHandler).Methods("DELETE")
