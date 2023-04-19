@@ -6,40 +6,34 @@ option go_package = "proto/food";
 message GetFoodByIdRequest {
   int64 Id = 1;
 }
+
+message Food {
+    string  Foodid = 1;
+    string  Name = 2;
+    string  Brand = 3;
+    float   Amount = 4;
+    string  Unit = 5;
+    float   Carb = 6;
+    float   Portein = 7;
+    float   Fat = 8;
+    float   Cal = 9;
+}
+message GetFoodsRequest{}
 message GetFoodByIdResponse {
-    string  Foodid = 1;
-    string  Name = 2;
-    string  Brand = 3;
-    float   Amount = 4;
-    string  Unit = 5;
-    float   Carb = 6;
-    float   Portein = 7;
-    float   Fat = 8;
-    float   Cal = 9;
+    Food food = 1;
+}
+message GetFoodsResponse {
+    repeated Food food = 1;
 }
 
-message CreateFoodRequest {
-    string  Name = 1;
-    string  Brand = 2;
-    float   Amount = 3;
-    string  Unit = 4;
-    float   Carb = 5;
-    float   Portein = 6;
-    float   Fat = 7;
-    float   Cal = 8;
+message FoodRequest {
+    Food food = 1;
 }
 
-message UpdateFoodRequest {
-    string  Foodid = 1;
-    string  Name = 2;
-    string  Brand = 3;
-    float   Amount = 4;
-    string  Unit = 5;
-    float   Carb = 6;
-    float   Portein = 7;
-    float   Fat = 8;
-    float   Cal = 9;
+message GetAllResponse {
+    repeated Food foods = 1;
 }
+
 message DefaultResponse {
     string result = 1;
 }
@@ -50,7 +44,8 @@ message DeleteFoodRequest {
 
 service FoodService {
   rpc GetFoodById(GetFoodByIdRequest) returns (GetFoodByIdResponse) {};
-  rpc CreateFood(CreateFoodRequest) returns (DefaultResponse) {};
-  rpc UpdateFood(UpdateFoodRequest) returns (DefaultResponse) {};
+  rpc GetFoods(GetFoodsRequest) returns (GetFoodsResponse) {};
+  rpc CreateFood(FoodRequest) returns (DefaultResponse) {};
+  rpc UpdateFood(FoodRequest) returns (DefaultResponse) {};
   rpc DeleteFood(DeleteFoodRequest) returns (DefaultResponse) {};
 }

@@ -21,6 +21,7 @@ const _ = grpc.SupportPackageIsVersion7
 
 const (
 	FoodService_GetFoodById_FullMethodName = "/food.FoodService/GetFoodById"
+	FoodService_GetFoods_FullMethodName    = "/food.FoodService/GetFoods"
 	FoodService_CreateFood_FullMethodName  = "/food.FoodService/CreateFood"
 	FoodService_UpdateFood_FullMethodName  = "/food.FoodService/UpdateFood"
 	FoodService_DeleteFood_FullMethodName  = "/food.FoodService/DeleteFood"
@@ -31,8 +32,9 @@ const (
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type FoodServiceClient interface {
 	GetFoodById(ctx context.Context, in *GetFoodByIdRequest, opts ...grpc.CallOption) (*GetFoodByIdResponse, error)
-	CreateFood(ctx context.Context, in *CreateFoodRequest, opts ...grpc.CallOption) (*DefaultResponse, error)
-	UpdateFood(ctx context.Context, in *UpdateFoodRequest, opts ...grpc.CallOption) (*DefaultResponse, error)
+	GetFoods(ctx context.Context, in *GetFoodsRequest, opts ...grpc.CallOption) (*GetFoodsResponse, error)
+	CreateFood(ctx context.Context, in *FoodRequest, opts ...grpc.CallOption) (*DefaultResponse, error)
+	UpdateFood(ctx context.Context, in *FoodRequest, opts ...grpc.CallOption) (*DefaultResponse, error)
 	DeleteFood(ctx context.Context, in *DeleteFoodRequest, opts ...grpc.CallOption) (*DefaultResponse, error)
 }
 
@@ -53,7 +55,16 @@ func (c *foodServiceClient) GetFoodById(ctx context.Context, in *GetFoodByIdRequ
 	return out, nil
 }
 
-func (c *foodServiceClient) CreateFood(ctx context.Context, in *CreateFoodRequest, opts ...grpc.CallOption) (*DefaultResponse, error) {
+func (c *foodServiceClient) GetFoods(ctx context.Context, in *GetFoodsRequest, opts ...grpc.CallOption) (*GetFoodsResponse, error) {
+	out := new(GetFoodsResponse)
+	err := c.cc.Invoke(ctx, FoodService_GetFoods_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *foodServiceClient) CreateFood(ctx context.Context, in *FoodRequest, opts ...grpc.CallOption) (*DefaultResponse, error) {
 	out := new(DefaultResponse)
 	err := c.cc.Invoke(ctx, FoodService_CreateFood_FullMethodName, in, out, opts...)
 	if err != nil {
@@ -62,7 +73,7 @@ func (c *foodServiceClient) CreateFood(ctx context.Context, in *CreateFoodReques
 	return out, nil
 }
 
-func (c *foodServiceClient) UpdateFood(ctx context.Context, in *UpdateFoodRequest, opts ...grpc.CallOption) (*DefaultResponse, error) {
+func (c *foodServiceClient) UpdateFood(ctx context.Context, in *FoodRequest, opts ...grpc.CallOption) (*DefaultResponse, error) {
 	out := new(DefaultResponse)
 	err := c.cc.Invoke(ctx, FoodService_UpdateFood_FullMethodName, in, out, opts...)
 	if err != nil {
@@ -85,8 +96,9 @@ func (c *foodServiceClient) DeleteFood(ctx context.Context, in *DeleteFoodReques
 // for forward compatibility
 type FoodServiceServer interface {
 	GetFoodById(context.Context, *GetFoodByIdRequest) (*GetFoodByIdResponse, error)
-	CreateFood(context.Context, *CreateFoodRequest) (*DefaultResponse, error)
-	UpdateFood(context.Context, *UpdateFoodRequest) (*DefaultResponse, error)
+	GetFoods(context.Context, *GetFoodsRequest) (*GetFoodsResponse, error)
+	CreateFood(context.Context, *FoodRequest) (*DefaultResponse, error)
+	UpdateFood(context.Context, *FoodRequest) (*DefaultResponse, error)
 	DeleteFood(context.Context, *DeleteFoodRequest) (*DefaultResponse, error)
 	// mustEmbedUnimplementedFoodServiceServer()
 }
@@ -98,10 +110,13 @@ type UnimplementedFoodServiceServer struct {
 func (UnimplementedFoodServiceServer) GetFoodById(context.Context, *GetFoodByIdRequest) (*GetFoodByIdResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetFoodById not implemented")
 }
-func (UnimplementedFoodServiceServer) CreateFood(context.Context, *CreateFoodRequest) (*DefaultResponse, error) {
+func (UnimplementedFoodServiceServer) GetFoods(context.Context, *GetFoodsRequest) (*GetFoodsResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetFoods not implemented")
+}
+func (UnimplementedFoodServiceServer) CreateFood(context.Context, *FoodRequest) (*DefaultResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CreateFood not implemented")
 }
-func (UnimplementedFoodServiceServer) UpdateFood(context.Context, *UpdateFoodRequest) (*DefaultResponse, error) {
+func (UnimplementedFoodServiceServer) UpdateFood(context.Context, *FoodRequest) (*DefaultResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method UpdateFood not implemented")
 }
 func (UnimplementedFoodServiceServer) DeleteFood(context.Context, *DeleteFoodRequest) (*DefaultResponse, error) {
@@ -139,8 +154,26 @@ func _FoodService_GetFoodById_Handler(srv interface{}, ctx context.Context, dec 
 	return interceptor(ctx, in, info, handler)
 }
 
+func _FoodService_GetFoods_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetFoodsRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(FoodServiceServer).GetFoods(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: FoodService_GetFoods_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(FoodServiceServer).GetFoods(ctx, req.(*GetFoodsRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _FoodService_CreateFood_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(CreateFoodRequest)
+	in := new(FoodRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -152,13 +185,13 @@ func _FoodService_CreateFood_Handler(srv interface{}, ctx context.Context, dec f
 		FullMethod: FoodService_CreateFood_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(FoodServiceServer).CreateFood(ctx, req.(*CreateFoodRequest))
+		return srv.(FoodServiceServer).CreateFood(ctx, req.(*FoodRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
 func _FoodService_UpdateFood_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(UpdateFoodRequest)
+	in := new(FoodRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -170,7 +203,7 @@ func _FoodService_UpdateFood_Handler(srv interface{}, ctx context.Context, dec f
 		FullMethod: FoodService_UpdateFood_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(FoodServiceServer).UpdateFood(ctx, req.(*UpdateFoodRequest))
+		return srv.(FoodServiceServer).UpdateFood(ctx, req.(*FoodRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -203,6 +236,10 @@ var FoodService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetFoodById",
 			Handler:    _FoodService_GetFoodById_Handler,
+		},
+		{
+			MethodName: "GetFoods",
+			Handler:    _FoodService_GetFoods_Handler,
 		},
 		{
 			MethodName: "CreateFood",

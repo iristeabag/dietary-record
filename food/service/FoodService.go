@@ -24,7 +24,7 @@ type Food struct {
 }
 
 type IFoodRepository interface {
-	GetFoodById(ctx context.Context, id int64) (interface{}, error)
+	GetFoodById(ctx context.Context, id int) (interface{}, error)
 	GetAllFoods(ctx context.Context) (interface{}, error)
 	CreateFood(ctx context.Context, food Food) error
 	UpdateFood(ctx context.Context, food Food) (string, error)
@@ -37,10 +37,10 @@ type FoodService struct {
 }
 
 type IFoodService interface {
-	GetFoodById(ctx context.Context, id int64) (interface{}, error)
+	GetFoodById(ctx context.Context, id int) (interface{}, error)
 	GetAllFoods(ctx context.Context) (interface{}, error)
 	CreateFood(ctx context.Context, food Food) (string, error)
-	UpdateFood(ctx context.Context, id string, food Food) (string, error)
+	UpdateFood(ctx context.Context, food Food) (string, error)
 	DeleteFood(ctx context.Context, id int) (string, error)
 }
 
@@ -52,7 +52,7 @@ func NewFoodService(rep IFoodRepository, logger log.Logger) IFoodService {
 	}
 }
 
-func (s FoodService) GetFoodById(ctx context.Context, id int64) (interface{}, error) {
+func (s FoodService) GetFoodById(ctx context.Context, id int) (interface{}, error) {
 	var food interface{}
 	var empty interface{}
 
@@ -97,20 +97,20 @@ func (s FoodService) CreateFood(ctx context.Context, food Food) (string, error) 
 	return msg, nil
 }
 
-func (s FoodService) UpdateFood(ctx context.Context, id string, food Food) (string, error) {
-	foodDetail := Food{
-		Foodid:  id,
-		Name:    food.Name,
-		Brand:   food.Brand,
-		Amount:  food.Amount,
-		Unit:    food.Unit,
-		Carb:    food.Carb,
-		Portein: food.Portein,
-		Fat:     food.Fat,
-		Cal:     food.Cal,
-	}
+func (s FoodService) UpdateFood(ctx context.Context, food Food) (string, error) {
+	// foodDetail := Food{
+	// 	Foodid:  id,
+	// 	Name:    food.Name,
+	// 	Brand:   food.Brand,
+	// 	Amount:  food.Amount,
+	// 	Unit:    food.Unit,
+	// 	Carb:    food.Carb,
+	// 	Portein: food.Portein,
+	// 	Fat:     food.Fat,
+	// 	Cal:     food.Cal,
+	// }
 
-	msg, err := s.repository.UpdateFood(ctx, foodDetail)
+	msg, err := s.repository.UpdateFood(ctx, food)
 	if err != nil {
 		return "", err
 	}

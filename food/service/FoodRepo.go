@@ -62,7 +62,7 @@ func newFood(f FoodObj) Food {
 	}
 }
 
-func (f *FoodRepository) GetFoodById(ctx context.Context, id int64) (interface{}, error) {
+func (f *FoodRepository) GetFoodById(ctx context.Context, id int) (interface{}, error) {
 	var food FoodObj
 	q := `SELECT id, name, brand, amount, unit, carb, portein, fat, cal FROM food WHERE id=$1`
 	row := f.db.QueryRowContext(ctx, q, id)
@@ -111,7 +111,7 @@ func (f *FoodRepository) CreateFood(ctx context.Context, food Food) error {
 func (f *FoodRepository) UpdateFood(ctx context.Context, food Food) (string, error) {
 	fmt.Println(food.Foodid)
 	id, _ := strconv.Atoi(food.Foodid)
-	fmt.Println(id)
+
 	q := `UPDATE food SET name=$1, brand=$2, amount=$3, unit=$4, carb=$5, portein=$6, fat=$7, cal=$8 WHERE id=$9`
 	res, err := f.db.ExecContext(ctx, q, food.Name, food.Brand, food.Amount, food.Unit, food.Cal, food.Portein, food.Fat, food.Cal, id)
 

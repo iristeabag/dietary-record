@@ -11,6 +11,7 @@ import (
 
 type grpcFoodServer struct {
 	getbyid    gt.Handler
+	getfoods   gt.Handler
 	createfood gt.Handler
 	updatefood gt.Handler
 	deletefood gt.Handler
@@ -22,6 +23,11 @@ func NewGRPCServer(endpoints GrpcEndpoints, logger log.Logger) pb.FoodServiceSer
 			endpoints.GetById,
 			DecodeGrpcGetFoodByIdRequest,
 			EncodeGrpcResponse,
+		),
+		getfoods: gt.NewServer(
+			endpoints.GetFoods,
+			DecodeGrpcGetFoodsequest,
+			EncodeGrpcGetFoodsResponse,
 		),
 		createfood: gt.NewServer(
 			endpoints.CreateFood,
@@ -50,7 +56,52 @@ func (s *grpcFoodServer) GetFoodById(ctx context.Context, req *pb.GetFoodByIdReq
 	return resp.(*pb.GetFoodByIdResponse), nil
 }
 
-func (s *grpcFoodServer) CreateFood(ctx context.Context, req *pb.CreateFoodRequest) (*pb.DefaultResponse, error) {
+func (s *grpcFoodServer) GetFoods(ctx context.Context, req *pb.GetFoodsRequest) (*pb.GetFoodsResponse, error) {
+	_, resp, err := s.getfoods.ServeGRPC(ctx, req)
+	if err != nil {
+		return nil, err
+	}
+
+	return resp.(*pb.GetFoodsResponse), nil
+}
+
+func DecodeGrpcGetFoodsequest(_ context.Context, request interface{}) (interface{}, error) {
+	// request.(*pb.GetFoodsRequest)
+	return GetFoodsReq{}, nil
+}
+
+func EncodeGrpcGetFoodsResponse(_ context.Context, response interface{}) (interface{}, error) {
+	resp := response.(GetFoodsGrpcResp)
+
+	if resp.Food == nil {
+		return nil, errors.New("id not found")
+	}
+
+	foodlist := resp.Food.([]interface{})
+
+	var results []*pb.Food
+	for _, item := range foodlist {
+		food := item.(Food)
+		result := pb.Food{
+			Foodid:  food.Foodid,
+			Name:    food.Name,
+			Brand:   food.Brand,
+			Amount:  float32(food.Amount),
+			Unit:    food.Unit,
+			Carb:    float32(food.Carb),
+			Portein: float32(food.Portein),
+			Fat:     float32(food.Fat),
+			Cal:     float32(food.Cal),
+		}
+		results = append(results, &result)
+	}
+
+	return &pb.GetFoodsResponse{
+		Food: results,
+	}, nil
+}
+
+func (s *grpcFoodServer) CreateFood(ctx context.Context, req *pb.FoodRequest) (*pb.DefaultResponse, error) {
 	_, resp, err := s.createfood.ServeGRPC(ctx, req)
 	if err != nil {
 		return nil, err
@@ -59,7 +110,7 @@ func (s *grpcFoodServer) CreateFood(ctx context.Context, req *pb.CreateFoodReque
 	return resp.(*pb.DefaultResponse), nil
 }
 
-func (s *grpcFoodServer) UpdateFood(ctx context.Context, req *pb.UpdateFoodRequest) (*pb.DefaultResponse, error) {
+func (s *grpcFoodServer) UpdateFood(ctx context.Context, req *pb.FoodRequest) (*pb.DefaultResponse, error) {
 	_, resp, err := s.updatefood.ServeGRPC(ctx, req)
 	if err != nil {
 		return nil, err
@@ -90,7 +141,8 @@ func EncodeGrpcResponse(_ context.Context, response interface{}) (interface{}, e
 	}
 
 	food := resp.Food.(Food)
-	return &pb.GetFoodByIdResponse{
+
+	result := pb.Food{
 		Foodid:  food.Foodid,
 		Name:    food.Name,
 		Brand:   food.Brand,
@@ -100,37 +152,43 @@ func EncodeGrpcResponse(_ context.Context, response interface{}) (interface{}, e
 		Portein: float32(food.Portein),
 		Fat:     float32(food.Fat),
 		Cal:     float32(food.Cal),
+	}
+
+	return &pb.GetFoodByIdResponse{
+		Food: &result,
 	}, nil
 
 }
 
 func DecodeGrpcCreateFoodRequest(_ context.Context, request interface{}) (interface{}, error) {
-	req := request.(*pb.CreateFoodRequest)
+	req := request.(*pb.FoodRequest)
 
 	food := Food{
-		Name:    req.Name,
-		Brand:   req.Brand,
-		Amount:  float64(req.Amount),
-		Unit:    req.Unit,
-		Carb:    float64(req.Carb),
-		Portein: float64(req.Portein),
-		Fat:     float64(req.Fat),
-		Cal:     float64(req.Cal),
+		Name:    req.Food.Name,
+		Brand:   req.Food.Brand,
+		Amount:  float64(req.Food.Amount),
+		Unit:    req.Food.Unit,
+		Carb:    float64(req.Food.Carb),
+		Portein: float64(req.Food.Portein),
+		Fat:     float64(req.Food.Fat),
+		Cal:     float64(req.Food.Cal),
 	}
+
 	return FoodReq{Food: food}, nil
 }
 
 func DecodeGrpcUpdateFoodRequest(_ context.Context, request interface{}) (interface{}, error) {
-	req := request.(*pb.UpdateFoodRequest)
+	req := request.(*pb.FoodRequest)
 	food := Food{
-		Name:    req.Name,
-		Brand:   req.Brand,
-		Amount:  float64(req.Amount),
-		Unit:    req.Unit,
-		Carb:    float64(req.Carb),
-		Portein: float64(req.Portein),
-		Fat:     float64(req.Fat),
-		Cal:     float64(req.Cal),
+		Foodid:  req.Food.Foodid,
+		Name:    req.Food.Name,
+		Brand:   req.Food.Brand,
+		Amount:  float64(req.Food.Amount),
+		Unit:    req.Food.Unit,
+		Carb:    float64(req.Food.Carb),
+		Portein: float64(req.Food.Portein),
+		Fat:     float64(req.Food.Fat),
+		Cal:     float64(req.Food.Cal),
 	}
 	return FoodReq{Food: food}, nil
 }
