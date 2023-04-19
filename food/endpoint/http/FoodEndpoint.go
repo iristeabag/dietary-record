@@ -70,17 +70,20 @@ func GetAllFoodsEndpoint(s svc.IFoodService) endpoint.Endpoint {
 
 func CreateFoodEndpoint(s svc.IFoodService) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
-		req := request.(CreateFoodRequest)
-		msg, err := s.CreateFood(ctx, req.food)
+		// req := request.(CreateFoodRequest)
+		// msg, err := s.CreateFood(ctx, req.food)
+		req := request.(svc.Food)
+		msg, err := s.CreateFood(ctx, req)
 		return CreateFoodResponse{Msg: msg, Err: err}, nil
 	}
 }
 
 func UpdateFoodEndpoint(s svc.IFoodService) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
-		req := request.(UpdateFoodRequest)
-		req.food.Foodid = req.Id
-		msg, err := s.UpdateFood(ctx, req.food)
+		// req := request.(UpdateFoodRequest)
+		// req.food.Foodid = req.Id
+		req := request.(svc.Food)
+		msg, err := s.UpdateFood(ctx, req)
 		return UpdateFoodResponse{Msg: msg, Err: nil}, err
 	}
 }

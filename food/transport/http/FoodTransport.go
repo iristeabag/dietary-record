@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	endpoint "go-kit-demo/food/endpoint/http"
+	svc "go-kit-demo/food/service"
 	"net/http"
 
 	"github.com/gorilla/mux"
@@ -28,9 +29,10 @@ func DecodeGetAllFoodsRequest(_ context.Context, r *http.Request) (interface{}, 
 }
 
 func DecodeCreateFoodRequest(_ context.Context, r *http.Request) (interface{}, error) {
-	var req endpoint.CreateFoodRequest
+	// var req endpoint.CreateFoodRequest
+	var req svc.Food
 	fmt.Println("-------->>>>into Decoding")
-	if err := json.NewDecoder(r.Body).Decode(&req.food); err != nil {
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 		return nil, err
 	}
 	return req, nil
@@ -38,12 +40,13 @@ func DecodeCreateFoodRequest(_ context.Context, r *http.Request) (interface{}, e
 
 func DecodeUpdateFoodRequest(_ context.Context, r *http.Request) (interface{}, error) {
 	fmt.Println("-------->>>> Into Update Decoding")
-	var req endpoint.UpdateFoodRequest
+	// var req endpoint.UpdateFoodRequest
 	vars := mux.Vars(r)
-	req.Id = vars["foodid"]
-	if err := json.NewDecoder(r.Body).Decode(&req.food); err != nil {
+	var req svc.Food
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 		return nil, err
 	}
+	req.Foodid = vars["foodid"]
 	return req, nil
 }
 

@@ -91,6 +91,8 @@ func GetAllEatsEndpoint(e svc.IEatService) endpoint.Endpoint {
 
 func CreateEatEndpoint(e svc.IEatService) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
+		// req := request.(svc.Eat)
+		// msg, err := e.CreateEat(ctx, req)
 		req := request.(svc.Eat)
 		msg, err := e.CreateEat(ctx, req)
 		return CreateEatResponse{Msg: msg, Err: err}, nil

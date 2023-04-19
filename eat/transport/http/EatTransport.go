@@ -58,8 +58,9 @@ func DecodeCreateEatRequest(_ context.Context, r *http.Request) (interface{}, er
 
 func DecodeUpdateEatRequest(_ context.Context, r *http.Request) (interface{}, error) {
 	fmt.Println("-------->>>> Into Update Decoding")
-	var req endpoint.UpdateEatRequest
-	if err := json.NewDecoder(r.Body).Decode(&r); err != nil {
+	// var req endpoint.UpdateEatRequest
+	var req svc.Eat
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 		return nil, err
 	}
 	vars := mux.Vars(r)
