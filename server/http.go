@@ -8,7 +8,9 @@ import (
 	bep "go-kit-demo/body/endpoint/http"
 	b "go-kit-demo/body/service"
 	btp "go-kit-demo/body/transport/http"
+	eep "go-kit-demo/eat/endpoint/http"
 	e "go-kit-demo/eat/service"
+	etp "go-kit-demo/eat/transport/http"
 	f "go-kit-demo/food/service"
 
 	httptransport "github.com/go-kit/kit/transport/http"
@@ -80,29 +82,29 @@ func HttpRun(db *sql.DB, logger log.Logger) {
 	)
 	// Eat Handler
 	CreateEatHandler := httptransport.NewServer(
-		e.CreateEatEndpoint(eat),
-		e.DecodeCreateEatRequest,
-		e.EncodeResponse,
+		eep.CreateEatEndpoint(eat),
+		etp.DecodeCreateEatRequest,
+		etp.EncodeResponse,
 	)
 	GetByEatIdHandler := httptransport.NewServer(
-		e.GetEatByIdEndpoint(eat),
-		e.DecodeGetEatByIdRequest,
-		e.EncodeResponse,
+		eep.GetEatByIdEndpoint(eat),
+		etp.DecodeGetEatByIdRequest,
+		etp.EncodeResponse,
 	)
 	GetAllEatsHandler := httptransport.NewServer(
-		e.GetAllEatsEndpoint(eat),
-		e.DecodeGetAllEatsRequest,
-		e.EncodeResponse,
+		eep.GetAllEatsEndpoint(eat),
+		etp.DecodeGetAllEatsRequest,
+		etp.EncodeResponse,
 	)
 	UpdateEatHandler := httptransport.NewServer(
-		e.UpdateEatEndpoint(eat),
-		e.DecodeUpdateEatRequest,
-		e.EncodeResponse,
+		eep.UpdateEatEndpoint(eat),
+		etp.DecodeUpdateEatRequest,
+		etp.EncodeResponse,
 	)
 	DeleteEatHandler := httptransport.NewServer(
-		e.DeleteEatEndpoint(eat),
-		e.DecodeDeleteEatRequest,
-		e.EncodeResponse,
+		eep.DeleteEatEndpoint(eat),
+		etp.DecodeDeleteEatRequest,
+		etp.EncodeResponse,
 	)
 	// Body Handler
 	CreateBodyHandler := httptransport.NewServer(

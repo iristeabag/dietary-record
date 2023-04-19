@@ -4,16 +4,18 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	endpoint "go-kit-demo/eat/endpoint/http"
+	svc "go-kit-demo/eat/service"
 	"net/http"
 
 	"github.com/gorilla/mux"
 )
 
 func DecodeGetEatByIdRequest(_ context.Context, r *http.Request) (interface{}, error) {
-	var req GetEatByIdRequest
+	var req endpoint.GetEatByIdRequest
 	fmt.Println("-------->>>>into GetById Decoding")
 	vars := mux.Vars(r)
-	req = GetEatByIdRequest{
+	req = endpoint.GetEatByIdRequest{
 		Id: vars["eatid"],
 	}
 
@@ -21,10 +23,10 @@ func DecodeGetEatByIdRequest(_ context.Context, r *http.Request) (interface{}, e
 }
 
 func DecodeGetTotalEatByDateRequest(_ context.Context, r *http.Request) (interface{}, error) {
-	var req GetTotalEatByDateRequest
+	var req endpoint.GetTotalEatByDateRequest
 	fmt.Println("-------->>>>into GetById Decoding")
 	vars := mux.Vars(r)
-	req = GetTotalEatByDateRequest{
+	req = endpoint.GetTotalEatByDateRequest{
 		Date: vars["date"],
 	}
 
@@ -35,19 +37,20 @@ func DecodeGetAllEatsRequest(_ context.Context, r *http.Request) (interface{}, e
 	if r.URL.Query().Get("date") != "" {
 		fmt.Println("-------->>>> Into GetEatsByDate Decoding")
 		date := r.URL.Query().Get("date")
-		return GetAllEatsRequest{
+		return endpoint.GetAllEatsRequest{
 			Date: date,
 		}, nil
 	}
 	fmt.Println("-------->>>> Into GetEats Decoding")
-	var req GetAllEatsRequest
+	var req endpoint.GetAllEatsRequest
 	return req, nil
 }
 
 func DecodeCreateEatRequest(_ context.Context, r *http.Request) (interface{}, error) {
-	var req CreateEatRequest
+	// var req endpoint.CreateEatRequest
+	var req svc.Eat
 	fmt.Println("-------->>>>into Decoding")
-	if err := json.NewDecoder(r.Body).Decode(&req.eat); err != nil {
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 		return nil, err
 	}
 	return req, nil
@@ -55,12 +58,13 @@ func DecodeCreateEatRequest(_ context.Context, r *http.Request) (interface{}, er
 
 func DecodeUpdateEatRequest(_ context.Context, r *http.Request) (interface{}, error) {
 	fmt.Println("-------->>>> Into Update Decoding")
-	var req UpdateEatRequest
-	vars := mux.Vars(r)
-	req.Id = vars["eatid"]
-	if err := json.NewDecoder(r.Body).Decode(&req.eat); err != nil {
+	var req endpoint.UpdateEatRequest
+	if err := json.NewDecoder(r.Body).Decode(&r); err != nil {
 		return nil, err
 	}
+	vars := mux.Vars(r)
+	req.Id = vars["eatid"]
+
 	return req, nil
 }
 
@@ -72,9 +76,9 @@ func EncodeResponse(_ context.Context, w http.ResponseWriter, response interface
 
 func DecodeDeleteEatRequest(_ context.Context, r *http.Request) (interface{}, error) {
 	fmt.Println("-------->>>> Into Delete Decoding")
-	var req DeleteEatRequest
+	var req endpoint.DeleteEatRequest
 	vars := mux.Vars(r)
-	req = DeleteEatRequest{
+	req = endpoint.DeleteEatRequest{
 		Id: vars["eatid"],
 	}
 	return req, nil

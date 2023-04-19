@@ -3,6 +3,8 @@ package service
 import (
 	"context"
 
+	svc "go-kit-demo/eat/service"
+
 	"github.com/go-kit/kit/endpoint"
 )
 
@@ -21,7 +23,7 @@ type (
 		Err string
 	}
 	EatReq struct {
-		Eat Eat
+		Eat svc.Eat
 		Err string
 	}
 	DefaultResp struct {
@@ -39,7 +41,7 @@ type GrpcEndpoints struct {
 }
 
 // MakeEndpoints func initializes the Endpoint instances
-func MakeGrpcEndpoints(s IEatService) GrpcEndpoints {
+func MakeGrpcEndpoints(s svc.IEatService) GrpcEndpoints {
 	return GrpcEndpoints{
 		GetById:   GrpcGetEatByIdEndpoint(s),
 		GetEats:   GrpcGetEatsEndpoint(s),
@@ -49,7 +51,7 @@ func MakeGrpcEndpoints(s IEatService) GrpcEndpoints {
 	}
 }
 
-func GrpcGetEatByIdEndpoint(s IEatService) endpoint.Endpoint {
+func GrpcGetEatByIdEndpoint(s svc.IEatService) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (response interface{}, err error) {
 		req := request.(GetEatByIdGrpcReq)
 		eatDetails, err := s.GetEatById(ctx, int(req.Id))
@@ -61,7 +63,7 @@ func GrpcGetEatByIdEndpoint(s IEatService) endpoint.Endpoint {
 	}
 }
 
-func GrpcGetEatsEndpoint(s IEatService) endpoint.Endpoint {
+func GrpcGetEatsEndpoint(s svc.IEatService) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (response interface{}, err error) {
 		bodyDetails, err := s.GetAllEats(ctx)
 
@@ -72,7 +74,7 @@ func GrpcGetEatsEndpoint(s IEatService) endpoint.Endpoint {
 	}
 }
 
-func GrpcCreateEatEndpoint(s IEatService) endpoint.Endpoint {
+func GrpcCreateEatEndpoint(s svc.IEatService) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (response interface{}, err error) {
 		req := request.(EatReq)
 		result, err := s.CreateEat(ctx, req.Eat)
@@ -84,7 +86,7 @@ func GrpcCreateEatEndpoint(s IEatService) endpoint.Endpoint {
 	}
 }
 
-func GrpcUpdateEatEndpoint(s IEatService) endpoint.Endpoint {
+func GrpcUpdateEatEndpoint(s svc.IEatService) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (response interface{}, err error) {
 		req := request.(EatReq)
 		result, err := s.UpdateEat(ctx, req.Eat)
@@ -96,7 +98,7 @@ func GrpcUpdateEatEndpoint(s IEatService) endpoint.Endpoint {
 	}
 }
 
-func GrpcDeleteEatEndpoint(s IEatService) endpoint.Endpoint {
+func GrpcDeleteEatEndpoint(s svc.IEatService) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (response interface{}, err error) {
 		req := request.(GetEatByIdGrpcReq)
 		result, err := s.DeleteEat(ctx, int(req.Id))

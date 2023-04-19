@@ -4,6 +4,8 @@ import (
 	"context"
 	"strconv"
 
+	svc "go-kit-demo/eat/service"
+
 	"github.com/go-kit/kit/endpoint"
 )
 
@@ -33,7 +35,7 @@ type (
 		Err string      `json:"error,omitempty"`
 	}
 	CreateEatRequest struct {
-		eat Eat
+		eat svc.Eat
 	}
 	CreateEatResponse struct {
 		Msg string `json:"msg"`
@@ -41,7 +43,7 @@ type (
 	}
 	UpdateEatRequest struct {
 		Id  string `json:"eatid"`
-		eat Eat
+		eat svc.Eat
 	}
 	UpdateEatResponse struct {
 		Msg string `json:"status,omitempty"`
@@ -57,7 +59,7 @@ type (
 	}
 )
 
-func GetEatByIdEndpoint(e IEatService) endpoint.Endpoint {
+func GetEatByIdEndpoint(e svc.IEatService) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
 		req := request.(GetEatByIdRequest)
 		id, _ := strconv.Atoi(req.Id)
@@ -69,7 +71,7 @@ func GetEatByIdEndpoint(e IEatService) endpoint.Endpoint {
 	}
 }
 
-func GetAllEatsEndpoint(e IEatService) endpoint.Endpoint {
+func GetAllEatsEndpoint(e svc.IEatService) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
 		req := request.(GetAllEatsRequest)
 		var eatDetails interface{}
@@ -87,23 +89,23 @@ func GetAllEatsEndpoint(e IEatService) endpoint.Endpoint {
 	}
 }
 
-func CreateEatEndpoint(e IEatService) endpoint.Endpoint {
+func CreateEatEndpoint(e svc.IEatService) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
-		req := request.(CreateEatRequest)
-		msg, err := e.CreateEat(ctx, req.eat)
+		req := request.(svc.Eat)
+		msg, err := e.CreateEat(ctx, req)
 		return CreateEatResponse{Msg: msg, Err: err}, nil
 	}
 }
 
-func UpdateEatEndpoint(e IEatService) endpoint.Endpoint {
+func UpdateEatEndpoint(e svc.IEatService) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
-		req := request.(UpdateEatRequest)
-		msg, err := e.UpdateEat(ctx, req.eat)
+		req := request.(svc.Eat)
+		msg, err := e.UpdateEat(ctx, req)
 		return UpdateEatResponse{Msg: msg, Err: nil}, err
 	}
 }
 
-func DeleteEatEndpoint(e IEatService) endpoint.Endpoint {
+func DeleteEatEndpoint(e svc.IEatService) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
 		req := request.(DeleteEatRequest)
 		id, _ := strconv.Atoi(req.Id)

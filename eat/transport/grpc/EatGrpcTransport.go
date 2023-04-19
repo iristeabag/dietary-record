@@ -3,7 +3,9 @@ package service
 import (
 	"context"
 	"errors"
+	endpoint "go-kit-demo/eat/endpoint/grpc"
 	pb "go-kit-demo/eat/proto"
+	svc "go-kit-demo/eat/service"
 
 	gt "github.com/go-kit/kit/transport/grpc"
 	"github.com/go-kit/log"
@@ -17,7 +19,7 @@ type grpcEatServer struct {
 	deleteeat gt.Handler
 }
 
-func NewGRPCServer(endpoints GrpcEndpoints, logger log.Logger) pb.EatServiceServer {
+func NewGRPCServer(endpoints endpoint.GrpcEndpoints, logger log.Logger) pb.EatServiceServer {
 	return &grpcEatServer{
 		getbyid: gt.NewServer(
 			endpoints.GetById,
@@ -94,22 +96,22 @@ func (s *grpcEatServer) DeleteEat(ctx context.Context, req *pb.GetByIdRequest) (
 
 func DecodeGrpcGetEatByIdRequest(_ context.Context, request interface{}) (interface{}, error) {
 	req := request.(*pb.GetByIdRequest)
-	return GetEatByIdGrpcReq{Id: req.Id}, nil
+	return endpoint.GetEatByIdGrpcReq{Id: req.Id}, nil
 }
 
 func DecodeGrpcGetEatsequest(_ context.Context, request interface{}) (interface{}, error) {
 	// request.(*pb.GetEatsRequest)
-	return GetEatsReq{}, nil
+	return endpoint.GetEatsReq{}, nil
 }
 
 func EncodeGrpcResponse(_ context.Context, response interface{}) (interface{}, error) {
-	resp := response.(GetEatByIdGrpcResp)
+	resp := response.(endpoint.GetEatByIdGrpcResp)
 
 	if resp.Eat == nil {
 		return nil, errors.New("id not found")
 	}
 
-	eat := resp.Eat.(Eat)
+	eat := resp.Eat.(svc.Eat)
 
 	result := pb.Eat{
 		Eatid:   eat.Id,
@@ -130,7 +132,7 @@ func EncodeGrpcResponse(_ context.Context, response interface{}) (interface{}, e
 }
 
 func EncodeGrpcGetEatsResponse(_ context.Context, response interface{}) (interface{}, error) {
-	resp := response.(GetEatsGrpcResp)
+	resp := response.(endpoint.GetEatsGrpcResp)
 
 	if resp.Eat == nil {
 		return nil, errors.New("id not found")
@@ -140,7 +142,7 @@ func EncodeGrpcGetEatsResponse(_ context.Context, response interface{}) (interfa
 
 	var results []*pb.Eat
 	for _, item := range eatlist {
-		eat := item.(Eat)
+		eat := item.(svc.Eat)
 		result := pb.Eat{
 			Eatid:   eat.Id,
 			Foodid:  eat.Foodid,
@@ -163,7 +165,7 @@ func EncodeGrpcGetEatsResponse(_ context.Context, response interface{}) (interfa
 func DecodeGrpcCreateEatRequest(_ context.Context, request interface{}) (interface{}, error) {
 	req := request.(*pb.EatRequest)
 
-	eat := Eat{
+	eat := svc.Eat{
 		Foodid:  req.Eat.Foodid,
 		Name:    req.Eat.Name,
 		Amount:  float64(req.Eat.Amount),
@@ -174,12 +176,12 @@ func DecodeGrpcCreateEatRequest(_ context.Context, request interface{}) (interfa
 		Cal:     float64(req.Eat.Cal),
 	}
 
-	return EatReq{Eat: eat}, nil
+	return endpoint.EatReq{Eat: eat}, nil
 }
 
 func DecodeGrpcUpdateEatRequest(_ context.Context, request interface{}) (interface{}, error) {
 	req := request.(*pb.EatRequest)
-	eat := Eat{
+	eat := svc.Eat{
 		Id:      req.Eat.Eatid,
 		Foodid:  req.Eat.Foodid,
 		Name:    req.Eat.Name,
@@ -190,16 +192,16 @@ func DecodeGrpcUpdateEatRequest(_ context.Context, request interface{}) (interfa
 		Fat:     float64(req.Eat.Fat),
 		Cal:     float64(req.Eat.Cal),
 	}
-	return EatReq{Eat: eat}, nil
+	return endpoint.EatReq{Eat: eat}, nil
 }
 
 func DecodeGrpcDeleteEatRequest(_ context.Context, request interface{}) (interface{}, error) {
 	req := request.(*pb.GetByIdRequest)
-	return GetEatByIdGrpcReq{Id: req.Id}, nil
+	return endpoint.GetEatByIdGrpcReq{Id: req.Id}, nil
 }
 
 func EncodeGrpcDefaultResponse(_ context.Context, response interface{}) (interface{}, error) {
-	resp := response.(DefaultResp)
+	resp := response.(endpoint.DefaultResp)
 
 	return &pb.DefaultResponse{Result: resp.Result}, nil
 
