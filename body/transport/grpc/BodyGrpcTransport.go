@@ -1,9 +1,11 @@
-package service
+package transport
 
 import (
 	"context"
 	"errors"
+	endpoint "go-kit-demo/body/endpoint/grpc"
 	pb "go-kit-demo/body/proto"
+	svc "go-kit-demo/body/service"
 
 	gt "github.com/go-kit/kit/transport/grpc"
 	"github.com/go-kit/log"
@@ -17,7 +19,7 @@ type grpcBodyServer struct {
 	deletebody gt.Handler
 }
 
-func NewGRPCServer(endpoints GrpcEndpoints, logger log.Logger) pb.BodyServiceServer {
+func NewGRPCServer(endpoints endpoint.GrpcEndpoints, logger log.Logger) pb.BodyServiceServer {
 	return &grpcBodyServer{
 		getbyid: gt.NewServer(
 			endpoints.GetById,
@@ -94,17 +96,17 @@ func (s *grpcBodyServer) DeleteBody(ctx context.Context, req *pb.GetByIdRequest)
 
 func DecodeGrpcGetBodyByIdRequest(_ context.Context, request interface{}) (interface{}, error) {
 	req := request.(*pb.GetByIdRequest)
-	return IdGrpcReq{Id: req.Id}, nil
+	return endpoint.IdGrpcReq{Id: req.Id}, nil
 }
 
 func EncodeGrpcResponse(_ context.Context, response interface{}) (interface{}, error) {
-	resp := response.(GetBodyByIdGrpcResp)
+	resp := response.(endpoint.GetBodyByIdGrpcResp)
 
 	if resp.Body == nil {
 		return nil, errors.New("id not found")
 	}
 
-	body := resp.Body.(Body)
+	body := resp.Body.(svc.Body)
 
 	result := pb.Body{
 		Bodyid:  body.Id,
@@ -121,11 +123,11 @@ func EncodeGrpcResponse(_ context.Context, response interface{}) (interface{}, e
 
 func DecodeGrpcGetBodysequest(_ context.Context, request interface{}) (interface{}, error) {
 	// request.(*pb.GetBodysRequest)
-	return GetBodysReq{}, nil
+	return endpoint.GetBodysReq{}, nil
 }
 
 func EncodeGrpcGetBodysResponse(_ context.Context, response interface{}) (interface{}, error) {
-	resp := response.(GetBodysGrpcResp)
+	resp := response.(endpoint.GetBodysGrpcResp)
 
 	if resp.Body == nil {
 		return nil, errors.New("id not found")
@@ -136,7 +138,7 @@ func EncodeGrpcGetBodysResponse(_ context.Context, response interface{}) (interf
 
 	var results []*pb.Body
 	for _, item := range bodylist {
-		body := item.(Body)
+		body := item.(svc.Body)
 		result := pb.Body{
 			Bodyid:  body.Id,
 			Weight:  float32(body.Weight),
@@ -154,33 +156,33 @@ func EncodeGrpcGetBodysResponse(_ context.Context, response interface{}) (interf
 func DecodeGrpcCreateBodyRequest(_ context.Context, request interface{}) (interface{}, error) {
 	req := request.(*pb.CreateBodyRequest)
 
-	body := Body{
+	body := svc.Body{
 		Weight:  float64(req.Body.Weight),
 		Muscle:  float64(req.Body.Muscle),
 		FatRate: float64(req.Body.FatRate),
 	}
-	return BodyReq{Body: body}, nil
+	return endpoint.BodyReq{Body: body}, nil
 }
 
 func DecodeGrpcUpdateBodyRequest(_ context.Context, request interface{}) (interface{}, error) {
 	req := request.(*pb.UpdateBodyRequest)
 
-	body := Body{
+	body := svc.Body{
 		Id:      req.Body.Bodyid,
 		Weight:  float64(req.Body.Weight),
 		Muscle:  float64(req.Body.Muscle),
 		FatRate: float64(req.Body.FatRate),
 	}
-	return BodyReq{Body: body}, nil
+	return endpoint.BodyReq{Body: body}, nil
 }
 
 func DecodeGrpcDeleteBodyRequest(_ context.Context, request interface{}) (interface{}, error) {
 	req := request.(*pb.GetByIdRequest)
-	return IdGrpcReq{Id: req.Id}, nil
+	return endpoint.IdGrpcReq{Id: req.Id}, nil
 }
 
 func EncodeGrpcDefaultResponse(_ context.Context, response interface{}) (interface{}, error) {
-	resp := response.(DefaultResp)
+	resp := response.(endpoint.DefaultResp)
 
 	return &pb.DefaultResponse{Result: resp.Result}, nil
 

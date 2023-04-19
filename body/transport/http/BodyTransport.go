@@ -1,19 +1,21 @@
-package service
+package transport
 
 import (
 	"context"
 	"encoding/json"
 	"fmt"
+	endpoint "go-kit-demo/body/endpoint/http"
+	svc "go-kit-demo/body/service"
 	"net/http"
 
 	"github.com/gorilla/mux"
 )
 
 func DecodeGetBodyByIdRequest(_ context.Context, r *http.Request) (interface{}, error) {
-	var req GetBodyByIdRequest
+	var req endpoint.GetBodyByIdRequest
 	fmt.Println("-------->>>>into GetById Decoding")
 	vars := mux.Vars(r)
-	req = GetBodyByIdRequest{
+	req = endpoint.GetBodyByIdRequest{
 		Id: vars["bodyid"],
 	}
 
@@ -22,27 +24,31 @@ func DecodeGetBodyByIdRequest(_ context.Context, r *http.Request) (interface{}, 
 
 func DecodeGetAllBodysRequest(_ context.Context, r *http.Request) (interface{}, error) {
 	fmt.Println("-------->>>> Into GetBodys Decoding")
-	var req GetAllBodysRequest
+	var req endpoint.GetAllBodysRequest
 	return req, nil
 }
 
 func DecodeCreateBodyRequest(_ context.Context, r *http.Request) (interface{}, error) {
-	var req CreateBodyRequest
+	var req svc.Body
 	fmt.Println("-------->>>>into Decoding")
-	if err := json.NewDecoder(r.Body).Decode(&req.body); err != nil {
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 		return nil, err
 	}
+	// req := endpoint.CreateBodyRequest{}
+	// req.body = body
+
 	return req, nil
 }
 
 func DecodeUpdateBodyRequest(_ context.Context, r *http.Request) (interface{}, error) {
 	fmt.Println("-------->>>> Into Update Decoding")
-	var req UpdateBodyRequest
 	vars := mux.Vars(r)
-	req.Id = vars["bodyid"]
-	if err := json.NewDecoder(r.Body).Decode(&req.body); err != nil {
+	var req svc.Body
+
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 		return nil, err
 	}
+	req.Id = vars["bodyid"]
 	return req, nil
 }
 
@@ -54,9 +60,9 @@ func EncodeResponse(_ context.Context, w http.ResponseWriter, response interface
 
 func DecodeDeleteBodyRequest(_ context.Context, r *http.Request) (interface{}, error) {
 	fmt.Println("-------->>>> Into Delete Decoding")
-	var req DeleteBodyRequest
+	var req endpoint.DeleteBodyRequest
 	vars := mux.Vars(r)
-	req = DeleteBodyRequest{
+	req = endpoint.DeleteBodyRequest{
 		Id: vars["bodyid"],
 	}
 	return req, nil

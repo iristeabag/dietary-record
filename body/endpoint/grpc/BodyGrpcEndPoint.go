@@ -1,7 +1,9 @@
-package service
+package endpoint
 
 import (
 	"context"
+
+	svc "go-kit-demo/body/service"
 
 	"github.com/go-kit/kit/endpoint"
 )
@@ -21,7 +23,7 @@ type (
 		Err  string
 	}
 	BodyReq struct {
-		Body Body
+		Body svc.Body
 		Err  string
 	}
 	DefaultResp struct {
@@ -39,7 +41,7 @@ type GrpcEndpoints struct {
 }
 
 // MakeEndpoints func initializes the Endpoint instances
-func MakeGrpcEndpoints(s IBodyService) GrpcEndpoints {
+func MakeGrpcEndpoints(s svc.IBodyService) GrpcEndpoints {
 	return GrpcEndpoints{
 		GetById:    GrpcGetBodyByIdEndpoint(s),
 		GetBodys:   GrpcGetBodysEndpoint(s),
@@ -49,7 +51,7 @@ func MakeGrpcEndpoints(s IBodyService) GrpcEndpoints {
 	}
 }
 
-func GrpcGetBodyByIdEndpoint(s IBodyService) endpoint.Endpoint {
+func GrpcGetBodyByIdEndpoint(s svc.IBodyService) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (response interface{}, err error) {
 		req := request.(IdGrpcReq)
 		bodyDetails, err := s.GetBodyById(ctx, int(req.Id))
@@ -61,7 +63,7 @@ func GrpcGetBodyByIdEndpoint(s IBodyService) endpoint.Endpoint {
 	}
 }
 
-func GrpcGetBodysEndpoint(s IBodyService) endpoint.Endpoint {
+func GrpcGetBodysEndpoint(s svc.IBodyService) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (response interface{}, err error) {
 		bodyDetails, err := s.GetAllBodys(ctx)
 
@@ -72,7 +74,7 @@ func GrpcGetBodysEndpoint(s IBodyService) endpoint.Endpoint {
 	}
 }
 
-func GrpcCreateBodyEndpoint(s IBodyService) endpoint.Endpoint {
+func GrpcCreateBodyEndpoint(s svc.IBodyService) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (response interface{}, err error) {
 		req := request.(BodyReq)
 		result, err := s.CreateBody(ctx, req.Body)
@@ -84,7 +86,7 @@ func GrpcCreateBodyEndpoint(s IBodyService) endpoint.Endpoint {
 	}
 }
 
-func GrpcUpdateBodyEndpoint(s IBodyService) endpoint.Endpoint {
+func GrpcUpdateBodyEndpoint(s svc.IBodyService) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (response interface{}, err error) {
 		req := request.(BodyReq)
 		result, err := s.UpdateBody(ctx, req.Body)
@@ -96,7 +98,7 @@ func GrpcUpdateBodyEndpoint(s IBodyService) endpoint.Endpoint {
 	}
 }
 
-func GrpcDeleteBodyEndpoint(s IBodyService) endpoint.Endpoint {
+func GrpcDeleteBodyEndpoint(s svc.IBodyService) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (response interface{}, err error) {
 		req := request.(IdGrpcReq)
 		result, err := s.DeleteBody(ctx, int(req.Id))

@@ -1,7 +1,8 @@
-package service
+package endpoint
 
 import (
 	"context"
+	svc "go-kit-demo/body/service"
 	"strconv"
 
 	"github.com/go-kit/kit/endpoint"
@@ -23,7 +24,7 @@ type (
 	}
 
 	CreateBodyRequest struct {
-		body Body
+		body svc.Body
 	}
 	CreateBodyResponse struct {
 		Msg string `json:"msg"`
@@ -31,7 +32,7 @@ type (
 	}
 	UpdateBodyRequest struct {
 		Id   string `json:"bodyid"`
-		body Body
+		body svc.Body
 	}
 	UpdateBodyResponse struct {
 		Msg string `json:"status,omitempty"`
@@ -47,7 +48,7 @@ type (
 	}
 )
 
-func GetBodyByIdEndpoint(e IBodyService) endpoint.Endpoint {
+func GetBodyByIdEndpoint(e svc.IBodyService) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
 		req := request.(GetBodyByIdRequest)
 		id, _ := strconv.Atoi(req.Id)
@@ -59,7 +60,7 @@ func GetBodyByIdEndpoint(e IBodyService) endpoint.Endpoint {
 	}
 }
 
-func GetAllBodysEndpoint(e IBodyService) endpoint.Endpoint {
+func GetAllBodysEndpoint(e svc.IBodyService) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
 		bodyDetails, err := e.GetAllBodys(ctx)
 
@@ -70,24 +71,26 @@ func GetAllBodysEndpoint(e IBodyService) endpoint.Endpoint {
 	}
 }
 
-func CreateBodyEndpoint(e IBodyService) endpoint.Endpoint {
+func CreateBodyEndpoint(e svc.IBodyService) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
-		req := request.(CreateBodyRequest)
-		msg, err := e.CreateBody(ctx, req.body)
+		// req := request.(CreateBodyRequest)
+		// msg, err := e.CreateBody(ctx, req.body)
+		req := request.(svc.Body)
+		msg, err := e.CreateBody(ctx, req)
 		return CreateBodyResponse{Msg: msg, Err: err}, nil
 	}
 }
 
-func UpdateBodyEndpoint(s IBodyService) endpoint.Endpoint {
+func UpdateBodyEndpoint(s svc.IBodyService) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
-		req := request.(UpdateBodyRequest)
-		req.body.Id = req.Id
-		msg, err := s.UpdateBody(ctx, req.body)
+		req := request.(svc.Body)
+		// req.body.Id = req.Id
+		msg, err := s.UpdateBody(ctx, req)
 		return UpdateBodyResponse{Msg: msg, Err: nil}, err
 	}
 }
 
-func DeleteBodyEndpoint(e IBodyService) endpoint.Endpoint {
+func DeleteBodyEndpoint(e svc.IBodyService) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
 		req := request.(DeleteBodyRequest)
 		id, _ := strconv.Atoi(req.Id)

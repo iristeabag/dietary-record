@@ -5,7 +5,9 @@ import (
 	"net/http"
 	"os"
 
+	bep "go-kit-demo/body/endpoint/http"
 	b "go-kit-demo/body/service"
+	btp "go-kit-demo/body/transport/http"
 	e "go-kit-demo/eat/service"
 	f "go-kit-demo/food/service"
 
@@ -104,29 +106,29 @@ func HttpRun(db *sql.DB, logger log.Logger) {
 	)
 	// Body Handler
 	CreateBodyHandler := httptransport.NewServer(
-		b.CreateBodyEndpoint(body),
-		b.DecodeCreateBodyRequest,
-		b.EncodeResponse,
+		bep.CreateBodyEndpoint(body),
+		btp.DecodeCreateBodyRequest,
+		btp.EncodeResponse,
 	)
 	GetByBodyIdHandler := httptransport.NewServer(
-		b.GetBodyByIdEndpoint(body),
-		b.DecodeGetBodyByIdRequest,
-		b.EncodeResponse,
+		bep.GetBodyByIdEndpoint(body),
+		btp.DecodeGetBodyByIdRequest,
+		btp.EncodeResponse,
 	)
 	GetAllBodysHandler := httptransport.NewServer(
-		b.GetAllBodysEndpoint(body),
-		b.DecodeGetAllBodysRequest,
-		b.EncodeResponse,
+		bep.GetAllBodysEndpoint(body),
+		btp.DecodeGetAllBodysRequest,
+		btp.EncodeResponse,
 	)
 	UpdateBodyHandler := httptransport.NewServer(
-		b.UpdateBodyEndpoint(body),
-		b.DecodeUpdateBodyRequest,
-		b.EncodeResponse,
+		bep.UpdateBodyEndpoint(body),
+		btp.DecodeUpdateBodyRequest,
+		btp.EncodeResponse,
 	)
 	DeleteBodyHandler := httptransport.NewServer(
-		b.DeleteBodyEndpoint(body),
-		b.DecodeDeleteBodyRequest,
-		b.EncodeResponse,
+		bep.DeleteBodyEndpoint(body),
+		btp.DecodeDeleteBodyRequest,
+		btp.EncodeResponse,
 	)
 
 	r := mux.NewRouter()
