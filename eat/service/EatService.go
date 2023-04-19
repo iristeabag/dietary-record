@@ -26,13 +26,13 @@ type TotalEat struct {
 }
 
 type IEatRepository interface {
-	GetEatById(ctx context.Context, id string) (interface{}, error)
+	GetEatById(ctx context.Context, id int) (interface{}, error)
 	GetTotalEatByDate(ctx context.Context, date string) (interface{}, error)
 	GetEatsByDate(ctx context.Context, date string) (interface{}, error)
 	GetAllEats(ctx context.Context) (interface{}, error)
 	CreateEat(ctx context.Context, eat Eat) error
 	UpdateEat(ctx context.Context, eat Eat) (string, error)
-	DeleteEat(ctx context.Context, id string) (string, error)
+	DeleteEat(ctx context.Context, id int) (string, error)
 }
 
 type EatService struct {
@@ -41,13 +41,13 @@ type EatService struct {
 }
 
 type IEatService interface {
-	GetEatById(ctx context.Context, id string) (interface{}, error)
+	GetEatById(ctx context.Context, id int) (interface{}, error)
 	GetTotalEatByDate(ctx context.Context, date string) (interface{}, error)
 	GetEatsByDate(ctx context.Context, date string) (interface{}, error)
 	GetAllEats(ctx context.Context) (interface{}, error)
 	CreateEat(ctx context.Context, eat Eat) (string, error)
 	UpdateEat(ctx context.Context, eat Eat) (string, error)
-	DeleteEat(ctx context.Context, id string) (string, error)
+	DeleteEat(ctx context.Context, id int) (string, error)
 }
 
 func NewEatService(rep IEatRepository, logger log.Logger) IEatService {
@@ -57,7 +57,7 @@ func NewEatService(rep IEatRepository, logger log.Logger) IEatService {
 	}
 }
 
-func (s EatService) GetEatById(ctx context.Context, id string) (interface{}, error) {
+func (s EatService) GetEatById(ctx context.Context, id int) (interface{}, error) {
 	var eat interface{}
 	var empty interface{}
 
@@ -107,41 +107,15 @@ func (s EatService) GetAllEats(ctx context.Context) (interface{}, error) {
 
 func (s EatService) CreateEat(ctx context.Context, eat Eat) (string, error) {
 	var msg = "success"
-	var err error
-
-	eatDetail := Eat{
-		Id:      eat.Id,
-		Foodid:  eat.Foodid,
-		Name:    eat.Name,
-		Amount:  eat.Amount,
-		Unit:    eat.Unit,
-		Carb:    eat.Carb,
-		Portein: eat.Portein,
-		Fat:     eat.Fat,
-		Cal:     eat.Cal,
-	}
-
-	if err := s.repository.CreateEat(ctx, eatDetail); err != nil {
+	if err := s.repository.CreateEat(ctx, eat); err != nil {
 		return "", err
 	}
 
-	return msg, err
+	return msg, nil
 }
 
 func (s EatService) UpdateEat(ctx context.Context, eat Eat) (string, error) {
-	eatDetail := Eat{
-		Id:      eat.Id,
-		Foodid:  eat.Foodid,
-		Name:    eat.Name,
-		Amount:  eat.Amount,
-		Unit:    eat.Unit,
-		Carb:    eat.Carb,
-		Portein: eat.Portein,
-		Fat:     eat.Fat,
-		Cal:     eat.Cal,
-	}
-
-	msg, err := s.repository.UpdateEat(ctx, eatDetail)
+	msg, err := s.repository.UpdateEat(ctx, eat)
 	if err != nil {
 		return "", err
 	}
@@ -149,7 +123,7 @@ func (s EatService) UpdateEat(ctx context.Context, eat Eat) (string, error) {
 	return msg, nil
 }
 
-func (s EatService) DeleteEat(ctx context.Context, id string) (string, error) {
+func (s EatService) DeleteEat(ctx context.Context, id int) (string, error) {
 	msg, err := s.repository.DeleteEat(ctx, id)
 	if err != nil {
 		return "", err

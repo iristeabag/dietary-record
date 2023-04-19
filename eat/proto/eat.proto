@@ -1,0 +1,41 @@
+syntax = "proto3";
+
+package eat;
+option go_package = "proto/eat";
+
+message Eat {
+    string  Eatid = 1;
+    string  Foodid = 2;
+    string  Name = 3;
+    float   Amount = 4;
+    string  Unit = 5;
+    float   Carb = 6;
+    float   Portein = 7;
+    float   Fat = 8;
+    float   Cal = 9;
+}
+
+message GetByIdRequest {
+  int64 Id = 1;
+}
+message GetEatsRequest{}
+message GetEatByIdResponse {
+    Eat eat = 1;
+}
+message GetEatsResponse {
+    repeated Eat eat = 1;
+}
+message EatRequest {
+    Eat eat = 1;
+}
+message DefaultResponse {
+    string result = 1;
+}
+
+service EatService {
+  rpc GetEatById(GetByIdRequest) returns (GetEatByIdResponse) {};
+  rpc GetEats(GetEatsRequest) returns (GetEatsResponse) {};
+  rpc CreateEat(EatRequest) returns (DefaultResponse) {};
+  rpc UpdateEat(EatRequest) returns (DefaultResponse) {};
+  rpc DeleteEat(GetByIdRequest) returns (DefaultResponse) {};
+}

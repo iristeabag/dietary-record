@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"strconv"
 
 	"github.com/go-kit/kit/endpoint"
 )
@@ -39,6 +40,7 @@ type (
 		Err error  `json:"error,omitempty"`
 	}
 	UpdateEatRequest struct {
+		Id  string `json:"eatid"`
 		eat Eat
 	}
 	UpdateEatResponse struct {
@@ -58,18 +60,8 @@ type (
 func GetEatByIdEndpoint(e IEatService) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
 		req := request.(GetEatByIdRequest)
-		eatDetails, err := e.GetEatById(ctx, req.Id)
-		if err != nil {
-			return GetEatByIdResponse{Eat: eatDetails, Err: "Id not found"}, nil
-		}
-		return GetEatByIdResponse{Eat: eatDetails, Err: ""}, nil
-	}
-}
-
-func GetTotalEatByDateEndpoint(e IEatService) endpoint.Endpoint {
-	return func(ctx context.Context, request interface{}) (interface{}, error) {
-		req := request.(GetTotalEatByDateRequest)
-		eatDetails, err := e.GetEatById(ctx, req.Date)
+		id, _ := strconv.Atoi(req.Id)
+		eatDetails, err := e.GetEatById(ctx, int(id))
 		if err != nil {
 			return GetEatByIdResponse{Eat: eatDetails, Err: "Id not found"}, nil
 		}
@@ -107,14 +99,15 @@ func UpdateEatEndpoint(e IEatService) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
 		req := request.(UpdateEatRequest)
 		msg, err := e.UpdateEat(ctx, req.eat)
-		return msg, err
+		return UpdateEatResponse{Msg: msg, Err: nil}, err
 	}
 }
 
 func DeleteEatEndpoint(e IEatService) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
 		req := request.(DeleteEatRequest)
-		msg, err := e.DeleteEat(ctx, req.Id)
+		id, _ := strconv.Atoi(req.Id)
+		msg, err := e.DeleteEat(ctx, int(id))
 		if err != nil {
 			return DeleteEatResponse{Msg: msg, Err: err}, nil
 		}

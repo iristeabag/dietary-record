@@ -5,6 +5,8 @@ import (
 	"fmt"
 	bpb "go-kit-demo/body/proto"
 	b "go-kit-demo/body/service"
+	epb "go-kit-demo/eat/proto"
+	e "go-kit-demo/eat/service"
 	fpb "go-kit-demo/food/proto"
 	f "go-kit-demo/food/service"
 	"net"
@@ -44,10 +46,23 @@ func GrpcRun(db *sql.DB, logger log.Logger) {
 		body = b.NewBodyService(bodyRepo, logger)
 	}
 
+	var eat e.IEatService
+	eat = e.EatService{}
+	{
+		eatRepo, err := e.NewEatRepository(db, logger)
+		if err != nil {
+			level.Error(logger).Log("exit", err)
+			os.Exit(-1)
+		}
+		eat = e.NewEatService(eatRepo, logger)
+	}
+
 	foodendpoint := f.MakeGrpcEndpoints(food)
 	fgrpcServer := f.NewGRPCServer(foodendpoint, logger)
 	bodypoint := b.MakeGrpcEndpoints(body)
 	bgrpcServer := b.NewGRPCServer(bodypoint, logger)
+	eatpoint := e.MakeGrpcEndpoints(eat)
+	egrpcServer := e.NewGRPCServer(eatpoint, logger)
 
 	errs := make(chan error)
 	go func() {
@@ -66,6 +81,7 @@ func GrpcRun(db *sql.DB, logger log.Logger) {
 		baseServer := grpc.NewServer()
 		fpb.RegisterFoodServiceServer(baseServer, fgrpcServer)
 		bpb.RegisterBodyServiceServer(baseServer, bgrpcServer)
+		epb.RegisterEatServiceServer(baseServer, egrpcServer)
 		level.Info(logger).Log("msg", "Server started successfully 🚀")
 		baseServer.Serve(grpcListener)
 	}()
