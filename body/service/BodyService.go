@@ -84,14 +84,8 @@ func (s BodyService) CreateBody(ctx context.Context, body Body) (string, error) 
 }
 
 func (s BodyService) UpdateBody(ctx context.Context, body Body) (string, error) {
-	bodyDetail := Body{
-		Id:      body.Id,
-		Weight:  body.Weight,
-		Muscle:  body.Muscle,
-		FatRate: body.FatRate,
-	}
 
-	msg, err := s.repository.UpdateBody(ctx, bodyDetail)
+	msg, err := s.repository.UpdateBody(ctx, body)
 	if err != nil {
 		return "", err
 	}
