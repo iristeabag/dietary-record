@@ -94,6 +94,29 @@ func (e *BodyRepository) CreateBody(ctx context.Context, body Body) error {
 	return nil
 }
 
+func (e *BodyRepository) UpdateBody(ctx context.Context, body Body) (string, error) {
+	id, _ := strconv.Atoi(body.Id)
+	fmt.Println(id)
+	q := `UPDATE body SET weight=$1, muscle=$2, fat_rate=$3 WHERE id=$4`
+	res, err := e.db.ExecContext(ctx, q, body.Weight, body.Muscle, body.FatRate, body.Id)
+
+	if err != nil {
+		fmt.Println("Error occured inside UpdateFood in repo")
+		fmt.Println(err.Error())
+		return "", err
+	}
+
+	rowCnt, err := res.RowsAffected()
+	if err != nil {
+		return "", err
+	}
+	if rowCnt == 0 {
+		return "", ErrIdNotFound
+	}
+
+	return "Successfully updated", nil
+}
+
 func (e *BodyRepository) DeleteBody(ctx context.Context, id int) (string, error) {
 	res, err := e.db.ExecContext(ctx, "DELETE FROM body WHERE id = $1 ", id)
 	if err != nil {

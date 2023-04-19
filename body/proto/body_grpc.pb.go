@@ -21,7 +21,9 @@ const _ = grpc.SupportPackageIsVersion7
 
 const (
 	BodyService_GetBodyById_FullMethodName = "/body.BodyService/GetBodyById"
+	BodyService_GetBodys_FullMethodName    = "/body.BodyService/GetBodys"
 	BodyService_CreateBody_FullMethodName  = "/body.BodyService/CreateBody"
+	BodyService_UpdateBody_FullMethodName  = "/body.BodyService/UpdateBody"
 	BodyService_DeleteBody_FullMethodName  = "/body.BodyService/DeleteBody"
 )
 
@@ -30,7 +32,9 @@ const (
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type BodyServiceClient interface {
 	GetBodyById(ctx context.Context, in *GetByIdRequest, opts ...grpc.CallOption) (*GetBodyByIdResponse, error)
+	GetBodys(ctx context.Context, in *GetBodysRequest, opts ...grpc.CallOption) (*GetBodysResponse, error)
 	CreateBody(ctx context.Context, in *CreateBodyRequest, opts ...grpc.CallOption) (*DefaultResponse, error)
+	UpdateBody(ctx context.Context, in *UpdateBodyRequest, opts ...grpc.CallOption) (*DefaultResponse, error)
 	DeleteBody(ctx context.Context, in *GetByIdRequest, opts ...grpc.CallOption) (*DefaultResponse, error)
 }
 
@@ -51,9 +55,27 @@ func (c *bodyServiceClient) GetBodyById(ctx context.Context, in *GetByIdRequest,
 	return out, nil
 }
 
+func (c *bodyServiceClient) GetBodys(ctx context.Context, in *GetBodysRequest, opts ...grpc.CallOption) (*GetBodysResponse, error) {
+	out := new(GetBodysResponse)
+	err := c.cc.Invoke(ctx, BodyService_GetBodys_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *bodyServiceClient) CreateBody(ctx context.Context, in *CreateBodyRequest, opts ...grpc.CallOption) (*DefaultResponse, error) {
 	out := new(DefaultResponse)
 	err := c.cc.Invoke(ctx, BodyService_CreateBody_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *bodyServiceClient) UpdateBody(ctx context.Context, in *UpdateBodyRequest, opts ...grpc.CallOption) (*DefaultResponse, error) {
+	out := new(DefaultResponse)
+	err := c.cc.Invoke(ctx, BodyService_UpdateBody_FullMethodName, in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -74,7 +96,9 @@ func (c *bodyServiceClient) DeleteBody(ctx context.Context, in *GetByIdRequest, 
 // for forward compatibility
 type BodyServiceServer interface {
 	GetBodyById(context.Context, *GetByIdRequest) (*GetBodyByIdResponse, error)
+	GetBodys(context.Context, *GetBodysRequest) (*GetBodysResponse, error)
 	CreateBody(context.Context, *CreateBodyRequest) (*DefaultResponse, error)
+	UpdateBody(context.Context, *UpdateBodyRequest) (*DefaultResponse, error)
 	DeleteBody(context.Context, *GetByIdRequest) (*DefaultResponse, error)
 	// mustEmbedUnimplementedBodyServiceServer()
 }
@@ -86,8 +110,14 @@ type UnimplementedBodyServiceServer struct {
 func (UnimplementedBodyServiceServer) GetBodyById(context.Context, *GetByIdRequest) (*GetBodyByIdResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetBodyById not implemented")
 }
+func (UnimplementedBodyServiceServer) GetBodys(context.Context, *GetBodysRequest) (*GetBodysResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetBodys not implemented")
+}
 func (UnimplementedBodyServiceServer) CreateBody(context.Context, *CreateBodyRequest) (*DefaultResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CreateBody not implemented")
+}
+func (UnimplementedBodyServiceServer) UpdateBody(context.Context, *UpdateBodyRequest) (*DefaultResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UpdateBody not implemented")
 }
 func (UnimplementedBodyServiceServer) DeleteBody(context.Context, *GetByIdRequest) (*DefaultResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DeleteBody not implemented")
@@ -124,6 +154,24 @@ func _BodyService_GetBodyById_Handler(srv interface{}, ctx context.Context, dec 
 	return interceptor(ctx, in, info, handler)
 }
 
+func _BodyService_GetBodys_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetBodysRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(BodyServiceServer).GetBodys(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: BodyService_GetBodys_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(BodyServiceServer).GetBodys(ctx, req.(*GetBodysRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _BodyService_CreateBody_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(CreateBodyRequest)
 	if err := dec(in); err != nil {
@@ -138,6 +186,24 @@ func _BodyService_CreateBody_Handler(srv interface{}, ctx context.Context, dec f
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(BodyServiceServer).CreateBody(ctx, req.(*CreateBodyRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _BodyService_UpdateBody_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpdateBodyRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(BodyServiceServer).UpdateBody(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: BodyService_UpdateBody_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(BodyServiceServer).UpdateBody(ctx, req.(*UpdateBodyRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -172,8 +238,16 @@ var BodyService_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _BodyService_GetBodyById_Handler,
 		},
 		{
+			MethodName: "GetBodys",
+			Handler:    _BodyService_GetBodys_Handler,
+		},
+		{
 			MethodName: "CreateBody",
 			Handler:    _BodyService_CreateBody_Handler,
+		},
+		{
+			MethodName: "UpdateBody",
+			Handler:    _BodyService_UpdateBody_Handler,
 		},
 		{
 			MethodName: "DeleteBody",

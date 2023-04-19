@@ -17,6 +17,7 @@ type IBodyRepository interface {
 	GetBodyById(ctx context.Context, id int) (interface{}, error)
 	GetAllBodys(ctx context.Context) (interface{}, error)
 	CreateBody(ctx context.Context, body Body) error
+	UpdateBody(ctx context.Context, body Body) (string, error)
 	DeleteBody(ctx context.Context, id int) (string, error)
 }
 
@@ -29,6 +30,7 @@ type IBodyService interface {
 	GetBodyById(ctx context.Context, id int) (interface{}, error)
 	GetAllBodys(ctx context.Context) (interface{}, error)
 	CreateBody(ctx context.Context, body Body) (string, error)
+	UpdateBody(ctx context.Context, body Body) (string, error)
 	DeleteBody(ctx context.Context, id int) (string, error)
 }
 
@@ -79,6 +81,22 @@ func (s BodyService) CreateBody(ctx context.Context, body Body) (string, error) 
 	}
 
 	return msg, err
+}
+
+func (s BodyService) UpdateBody(ctx context.Context, body Body) (string, error) {
+	bodyDetail := Body{
+		Id:      body.Id,
+		Weight:  body.Weight,
+		Muscle:  body.Muscle,
+		FatRate: body.FatRate,
+	}
+
+	msg, err := s.repository.UpdateBody(ctx, bodyDetail)
+	if err != nil {
+		return "", err
+	}
+
+	return msg, nil
 }
 
 func (s BodyService) DeleteBody(ctx context.Context, id int) (string, error) {

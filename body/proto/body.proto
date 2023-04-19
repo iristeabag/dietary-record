@@ -3,20 +3,29 @@ syntax = "proto3";
 package body;
 option go_package = "proto/body";
 
+message GetBodysRequest{}
 message GetByIdRequest {
   int64 Id = 1;
 }
-message GetBodyByIdResponse {
+message Body {
     string Bodyid = 1;
     float  Weight = 2;
     float  Muscle = 3;
     float  FatRate = 4;
 }
+message GetBodyByIdResponse {
+    Body body = 1;
+}
+message GetBodysResponse {
+    repeated Body body = 1;
+}
 
 message CreateBodyRequest {
-    float  Weight = 1;
-    float  Muscle = 2;
-    float  FatRate = 3;
+    Body body = 1;
+}
+
+message UpdateBodyRequest {
+    Body body = 1;
 }
 message DefaultResponse {
     string result = 1;
@@ -24,6 +33,8 @@ message DefaultResponse {
 
 service BodyService {
   rpc GetBodyById(GetByIdRequest) returns (GetBodyByIdResponse) {};
+  rpc GetBodys(GetBodysRequest) returns (GetBodysResponse) {};
   rpc CreateBody(CreateBodyRequest) returns (DefaultResponse) {};
+  rpc UpdateBody(UpdateBodyRequest) returns (DefaultResponse) {};
   rpc DeleteBody(GetByIdRequest) returns (DefaultResponse) {};
 }

@@ -15,6 +15,11 @@ type (
 		// Id  int64
 		Err string
 	}
+	GetBodysReq      struct{}
+	GetBodysGrpcResp struct {
+		Body interface{}
+		Err  string
+	}
 	BodyReq struct {
 		Body Body
 		Err  string
@@ -27,7 +32,9 @@ type (
 // Endpoints struct holds the list of endpoints definition
 type GrpcEndpoints struct {
 	GetById    endpoint.Endpoint
+	GetBodys   endpoint.Endpoint
 	CreateBody endpoint.Endpoint
+	UpdateBody endpoint.Endpoint
 	DeleteBody endpoint.Endpoint
 }
 
@@ -35,7 +42,9 @@ type GrpcEndpoints struct {
 func MakeGrpcEndpoints(s IBodyService) GrpcEndpoints {
 	return GrpcEndpoints{
 		GetById:    GrpcGetBodyByIdEndpoint(s),
+		GetBodys:   GrpcGetBodysEndpoint(s),
 		CreateBody: GrpcCreateBodyEndpoint(s),
+		UpdateBody: GrpcUpdateBodyEndpoint(s),
 		DeleteBody: GrpcDeleteBodyEndpoint(s),
 	}
 }
@@ -52,6 +61,17 @@ func GrpcGetBodyByIdEndpoint(s IBodyService) endpoint.Endpoint {
 	}
 }
 
+func GrpcGetBodysEndpoint(s IBodyService) endpoint.Endpoint {
+	return func(ctx context.Context, request interface{}) (response interface{}, err error) {
+		bodyDetails, err := s.GetAllBodys(ctx)
+
+		if err != nil {
+			return GetBodysGrpcResp{Body: nil, Err: "Id not found"}, nil
+		}
+		return GetBodysGrpcResp{Body: bodyDetails, Err: ""}, nil
+	}
+}
+
 func GrpcCreateBodyEndpoint(s IBodyService) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (response interface{}, err error) {
 		req := request.(BodyReq)
@@ -59,6 +79,18 @@ func GrpcCreateBodyEndpoint(s IBodyService) endpoint.Endpoint {
 
 		if err != nil {
 			return DefaultResp{Result: "Create fail"}, nil
+		}
+		return DefaultResp{Result: result}, nil
+	}
+}
+
+func GrpcUpdateBodyEndpoint(s IBodyService) endpoint.Endpoint {
+	return func(ctx context.Context, request interface{}) (response interface{}, err error) {
+		req := request.(BodyReq)
+		result, err := s.UpdateBody(ctx, req.Body)
+
+		if err != nil {
+			return DefaultResp{Result: "Update fail"}, nil
 		}
 		return DefaultResp{Result: result}, nil
 	}

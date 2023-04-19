@@ -11,7 +11,9 @@ import (
 
 type grpcBodyServer struct {
 	getbyid    gt.Handler
+	getbodys   gt.Handler
 	createbody gt.Handler
+	updatebody gt.Handler
 	deletebody gt.Handler
 }
 
@@ -22,9 +24,19 @@ func NewGRPCServer(endpoints GrpcEndpoints, logger log.Logger) pb.BodyServiceSer
 			DecodeGrpcGetBodyByIdRequest,
 			EncodeGrpcResponse,
 		),
+		getbodys: gt.NewServer(
+			endpoints.GetBodys,
+			DecodeGrpcGetBodysequest,
+			EncodeGrpcGetBodysResponse,
+		),
 		createbody: gt.NewServer(
 			endpoints.CreateBody,
 			DecodeGrpcCreateBodyRequest,
+			EncodeGrpcDefaultResponse,
+		),
+		updatebody: gt.NewServer(
+			endpoints.UpdateBody,
+			DecodeGrpcUpdateBodyRequest,
 			EncodeGrpcDefaultResponse,
 		),
 		deletebody: gt.NewServer(
@@ -44,8 +56,26 @@ func (s *grpcBodyServer) GetBodyById(ctx context.Context, req *pb.GetByIdRequest
 	return resp.(*pb.GetBodyByIdResponse), nil
 }
 
+func (s *grpcBodyServer) GetBodys(ctx context.Context, req *pb.GetBodysRequest) (*pb.GetBodysResponse, error) {
+	_, resp, err := s.getbodys.ServeGRPC(ctx, req)
+	if err != nil {
+		return nil, err
+	}
+
+	return resp.(*pb.GetBodysResponse), nil
+}
+
 func (s *grpcBodyServer) CreateBody(ctx context.Context, req *pb.CreateBodyRequest) (*pb.DefaultResponse, error) {
 	_, resp, err := s.createbody.ServeGRPC(ctx, req)
+	if err != nil {
+		return nil, err
+	}
+
+	return resp.(*pb.DefaultResponse), nil
+}
+
+func (s *grpcBodyServer) UpdateBody(ctx context.Context, req *pb.UpdateBodyRequest) (*pb.DefaultResponse, error) {
+	_, resp, err := s.updatebody.ServeGRPC(ctx, req)
 	if err != nil {
 		return nil, err
 	}
@@ -75,22 +105,71 @@ func EncodeGrpcResponse(_ context.Context, response interface{}) (interface{}, e
 	}
 
 	body := resp.Body.(Body)
-	return &pb.GetBodyByIdResponse{
+
+	result := pb.Body{
 		Bodyid:  body.Id,
 		Weight:  float32(body.Weight),
 		Muscle:  float32(body.Muscle),
 		FatRate: float32(body.FatRate),
+	}
+
+	return &pb.GetBodyByIdResponse{
+		Body: &result,
 	}, nil
 
+}
+
+func DecodeGrpcGetBodysequest(_ context.Context, request interface{}) (interface{}, error) {
+	// request.(*pb.GetBodysRequest)
+	return GetBodysReq{}, nil
+}
+
+func EncodeGrpcGetBodysResponse(_ context.Context, response interface{}) (interface{}, error) {
+	resp := response.(GetBodysGrpcResp)
+
+	if resp.Body == nil {
+		return nil, errors.New("id not found")
+	}
+
+	// var bodys []Body
+	bodylist := resp.Body.([]interface{})
+
+	var results []*pb.Body
+	for _, item := range bodylist {
+		body := item.(Body)
+		result := pb.Body{
+			Bodyid:  body.Id,
+			Weight:  float32(body.Weight),
+			Muscle:  float32(body.Muscle),
+			FatRate: float32(body.FatRate),
+		}
+		results = append(results, &result)
+	}
+
+	return &pb.GetBodysResponse{
+		Body: results,
+	}, nil
 }
 
 func DecodeGrpcCreateBodyRequest(_ context.Context, request interface{}) (interface{}, error) {
 	req := request.(*pb.CreateBodyRequest)
 
 	body := Body{
-		Weight:  float64(req.Weight),
-		Muscle:  float64(req.Muscle),
-		FatRate: float64(req.FatRate),
+		Weight:  float64(req.Body.Weight),
+		Muscle:  float64(req.Body.Muscle),
+		FatRate: float64(req.Body.FatRate),
+	}
+	return BodyReq{Body: body}, nil
+}
+
+func DecodeGrpcUpdateBodyRequest(_ context.Context, request interface{}) (interface{}, error) {
+	req := request.(*pb.UpdateBodyRequest)
+
+	body := Body{
+		Id:      req.Body.Bodyid,
+		Weight:  float64(req.Body.Weight),
+		Muscle:  float64(req.Body.Muscle),
+		FatRate: float64(req.Body.FatRate),
 	}
 	return BodyReq{Body: body}, nil
 }
