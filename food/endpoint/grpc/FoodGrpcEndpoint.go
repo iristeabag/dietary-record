@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	svc "go-kit-demo/food/service"
 
 	"github.com/go-kit/kit/endpoint"
 )
@@ -21,7 +22,7 @@ type (
 		Err  string
 	}
 	FoodReq struct {
-		Food Food
+		Food svc.Food
 		Err  string
 	}
 	DefaultResp struct {
@@ -39,7 +40,7 @@ type GrpcEndpoints struct {
 }
 
 // MakeEndpoints func initializes the Endpoint instances
-func MakeGrpcEndpoints(s IFoodService) GrpcEndpoints {
+func MakeGrpcEndpoints(s svc.IFoodService) GrpcEndpoints {
 	return GrpcEndpoints{
 		GetById:    GrpcGetFoodByIdEndpoint(s),
 		GetFoods:   GrpcGetFoodsEndpoint(s),
@@ -49,7 +50,7 @@ func MakeGrpcEndpoints(s IFoodService) GrpcEndpoints {
 	}
 }
 
-func GrpcGetFoodByIdEndpoint(s IFoodService) endpoint.Endpoint {
+func GrpcGetFoodByIdEndpoint(s svc.IFoodService) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (response interface{}, err error) {
 		req := request.(GetFoodByIdGrpcReq)
 		foodDetails, err := s.GetFoodById(ctx, int(req.Id))
@@ -61,7 +62,7 @@ func GrpcGetFoodByIdEndpoint(s IFoodService) endpoint.Endpoint {
 	}
 }
 
-func GrpcGetFoodsEndpoint(s IFoodService) endpoint.Endpoint {
+func GrpcGetFoodsEndpoint(s svc.IFoodService) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (response interface{}, err error) {
 		bodyDetails, err := s.GetAllFoods(ctx)
 
@@ -72,7 +73,7 @@ func GrpcGetFoodsEndpoint(s IFoodService) endpoint.Endpoint {
 	}
 }
 
-func GrpcCreateFoodEndpoint(s IFoodService) endpoint.Endpoint {
+func GrpcCreateFoodEndpoint(s svc.IFoodService) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (response interface{}, err error) {
 		req := request.(FoodReq)
 		result, err := s.CreateFood(ctx, req.Food)
@@ -84,7 +85,7 @@ func GrpcCreateFoodEndpoint(s IFoodService) endpoint.Endpoint {
 	}
 }
 
-func GrpcUpdateFoodEndpoint(s IFoodService) endpoint.Endpoint {
+func GrpcUpdateFoodEndpoint(s svc.IFoodService) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (response interface{}, err error) {
 		req := request.(FoodReq)
 		result, err := s.UpdateFood(ctx, req.Food)
@@ -96,7 +97,7 @@ func GrpcUpdateFoodEndpoint(s IFoodService) endpoint.Endpoint {
 	}
 }
 
-func GrpcDeleteFoodEndpoint(s IFoodService) endpoint.Endpoint {
+func GrpcDeleteFoodEndpoint(s svc.IFoodService) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (response interface{}, err error) {
 		req := request.(GetFoodByIdGrpcReq)
 		result, err := s.DeleteFood(ctx, int(req.Id))

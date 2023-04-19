@@ -11,8 +11,10 @@ import (
 	epb "go-kit-demo/eat/proto"
 	e "go-kit-demo/eat/service"
 	etp "go-kit-demo/eat/transport/grpc"
+	fep "go-kit-demo/food/endpoint/grpc"
 	fpb "go-kit-demo/food/proto"
 	f "go-kit-demo/food/service"
+	ftp "go-kit-demo/food/transport/grpc"
 	"net"
 	"os"
 	"os/signal"
@@ -61,8 +63,8 @@ func GrpcRun(db *sql.DB, logger log.Logger) {
 		eat = e.NewEatService(eatRepo, logger)
 	}
 
-	foodendpoint := f.MakeGrpcEndpoints(food)
-	fgrpcServer := f.NewGRPCServer(foodendpoint, logger)
+	foodendpoint := fep.MakeGrpcEndpoints(food)
+	fgrpcServer := ftp.NewGRPCServer(foodendpoint, logger)
 	bodypoint := bep.MakeGrpcEndpoints(body)
 	bgrpcServer := btp.NewGRPCServer(bodypoint, logger)
 	eatpoint := eep.MakeGrpcEndpoints(eat)

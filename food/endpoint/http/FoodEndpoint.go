@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	svc "go-kit-demo/food/service"
 	"strconv"
 
 	"github.com/go-kit/kit/endpoint"
@@ -22,7 +23,7 @@ type (
 		Err  string      `json:"error,omitempty"`
 	}
 	CreateFoodRequest struct {
-		food Food
+		food svc.Food
 	}
 	CreateFoodResponse struct {
 		Msg string `json:"msg"`
@@ -30,7 +31,7 @@ type (
 	}
 	UpdateFoodRequest struct {
 		Id   string `json:"foodid"`
-		food Food
+		food svc.Food
 	}
 	UpdateFoodResponse struct {
 		Msg string `json:"status,omitempty"`
@@ -46,7 +47,7 @@ type (
 	}
 )
 
-func GetFoodByIdEndpoint(s IFoodService) endpoint.Endpoint {
+func GetFoodByIdEndpoint(s svc.IFoodService) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
 		req := request.(GetFoodByIdRequest)
 		id, _ := strconv.Atoi(req.Id)
@@ -57,7 +58,7 @@ func GetFoodByIdEndpoint(s IFoodService) endpoint.Endpoint {
 		return GetFoodByIdResponse{Food: foodDetails, Err: ""}, nil
 	}
 }
-func GetAllFoodsEndpoint(s IFoodService) endpoint.Endpoint {
+func GetAllFoodsEndpoint(s svc.IFoodService) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
 		foodDetails, err := s.GetAllFoods(ctx)
 		if err != nil {
@@ -67,7 +68,7 @@ func GetAllFoodsEndpoint(s IFoodService) endpoint.Endpoint {
 	}
 }
 
-func CreateFoodEndpoint(s IFoodService) endpoint.Endpoint {
+func CreateFoodEndpoint(s svc.IFoodService) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
 		req := request.(CreateFoodRequest)
 		msg, err := s.CreateFood(ctx, req.food)
@@ -75,7 +76,7 @@ func CreateFoodEndpoint(s IFoodService) endpoint.Endpoint {
 	}
 }
 
-func UpdateFoodEndpoint(s IFoodService) endpoint.Endpoint {
+func UpdateFoodEndpoint(s svc.IFoodService) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
 		req := request.(UpdateFoodRequest)
 		req.food.Foodid = req.Id
@@ -84,7 +85,7 @@ func UpdateFoodEndpoint(s IFoodService) endpoint.Endpoint {
 	}
 }
 
-func DeleteFoodEndpoint(s IFoodService) endpoint.Endpoint {
+func DeleteFoodEndpoint(s svc.IFoodService) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
 		req := request.(DeleteFoodRequest)
 		id, _ := strconv.Atoi(req.Foodid)
