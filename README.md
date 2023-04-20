@@ -14,6 +14,7 @@ go run main.go
 ## 架構介紹
 基於 go-kit 實現同時支援 http 與 grpc 的微服務。
 按照業務進行模組的拆分，每個業務是一個目錄。
+於 eat 飲食紀錄中使用到呼叫 grpc 驗證 id 是否存在之功能。
 
 ### 整體目錄結構
 ```
@@ -22,7 +23,6 @@ go run main.go
 │      ├─grpc
 │      └─http
 │  ├─migration # table sql
-│  ├─proto # proto 文件
 │  ├─service # 主要邏輯
 │  └─transport
 │      ├─grpc
@@ -32,7 +32,6 @@ go run main.go
 │      ├─grpc
 │      └─http
 │  ├─migration # table sql
-│  ├─proto # proto 文件
 │  ├─service # 主要邏輯
 │  └─transport
 │      ├─grpc
@@ -42,11 +41,11 @@ go run main.go
 │      ├─grpc
 │      └─http
 │  ├─migration # table sql
-│  ├─proto # proto 文件
 │  ├─service # 主要邏輯
 │  └─transport
 │      ├─grpc
 │      └─http
+├─proto # proto 文件
 └─server # http、grpc 服務
 ```
 ### DATABASE ERD 圖
