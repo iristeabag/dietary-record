@@ -6,6 +6,18 @@
 須先將執行 table 建置完畢。
 (需要 migration 可以從上方的 migration 目錄底下找到)
 
+#### 問題補充
+如果 migration 發生以下錯誤時，請先執行此 psql 指令
+```
+CREATE OR REPLACE FUNCTION trigger_set_timestamp()
+RETURNS TRIGGER AS $$
+BEGIN
+  NEW.updated_at = NOW();
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+```
+
 ### 啟動服務
 ```
 go run main.go
