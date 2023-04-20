@@ -11,4 +11,4 @@ create table food (
 	created_at timestamp not null default CURRENT_TIMESTAMP,
 	updated_at timestamp not null default CURRENT_TIMESTAMP
 );
-CREATE TRIGGER set_timestamp BEFORE UPDATE ON foods FOR EACH ROW EXECUTE PROCEDURE trigger_set_timestamp();
+CREATE TRIGGER set_timestamp BEFORE UPDATE ON food FOR EACH ROW EXECUTE PROCEDURE trigger_set_timestamp();

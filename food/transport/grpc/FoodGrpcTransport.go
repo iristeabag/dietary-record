@@ -4,8 +4,8 @@ import (
 	"context"
 	"errors"
 	endpoint "go-kit-demo/food/endpoint/grpc"
-	pb "go-kit-demo/food/proto"
 	svc "go-kit-demo/food/service"
+	pb "go-kit-demo/proto/food"
 
 	gt "github.com/go-kit/kit/transport/grpc"
 	"github.com/go-kit/log"

@@ -1,4 +1,4 @@
-create table eats (
+create table eat (
 	id serial PRIMARY KEY,
 	food_id int not null,
 	name varchar not null,
@@ -11,4 +11,4 @@ create table eats (
 	created_at timestamp not null default CURRENT_TIMESTAMP,
 	updated_at timestamp not null default CURRENT_TIMESTAMP
 );
-CREATE TRIGGER set_timestamp BEFORE UPDATE ON eats FOR EACH ROW EXECUTE PROCEDURE trigger_set_timestamp();
+CREATE TRIGGER set_timestamp BEFORE UPDATE ON eat FOR EACH ROW EXECUTE PROCEDURE trigger_set_timestamp();

@@ -2,8 +2,13 @@ package service
 
 import (
 	"context"
+	"strconv"
+
+	pb "go-kit-demo/proto/food"
 
 	"github.com/go-kit/log"
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials/insecure"
 )
 
 type Eat struct {
@@ -107,6 +112,24 @@ func (s EatService) GetAllEats(ctx context.Context) (interface{}, error) {
 
 func (s EatService) CreateEat(ctx context.Context, eat Eat) (string, error) {
 	var msg = "success"
+
+	address := "localhost:50057"
+	conn, err1 := grpc.Dial(address, grpc.WithTransportCredentials(insecure.NewCredentials()))
+	if err1 != nil {
+		return "", err1
+	}
+	defer conn.Close()
+	c := pb.NewFoodServiceClient(conn)
+	id, err2 := strconv.ParseInt(eat.Foodid, 10, 64)
+	if err2 != nil {
+		return "", err2
+	}
+	req := pb.GetFoodByIdRequest{Id: id}
+	_, err3 := c.GetFoodById(ctx, &req)
+	if err3 != nil {
+		return "", err3
+	}
+
 	if err := s.repository.CreateEat(ctx, eat); err != nil {
 		return "", err
 	}

@@ -44,5 +44,6 @@ func main() {
 	db := GetDbConn()
 	defer db.Close()
 	server.HttpRun(db, logger)
-	// server.GrpcRun(db, logger)
+	server.GrpcRun(db, logger)
+	server.FoodGrpcRun(db, logger)
 }

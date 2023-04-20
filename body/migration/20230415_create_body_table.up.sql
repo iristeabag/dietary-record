@@ -7,3 +7,5 @@ create table body (
 	created_at timestamp not null default CURRENT_TIMESTAMP,
 	updated_at timestamp not null default CURRENT_TIMESTAMP
 );
+
+CREATE TRIGGER set_timestamp BEFORE UPDATE ON body FOR EACH ROW EXECUTE PROCEDURE trigger_set_timestamp();
